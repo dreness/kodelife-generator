@@ -4,6 +4,8 @@ KodeLife Project Generator
 A Python library for creating KodeLife .klproj files programmatically.
 Supports creating complete shader projects with multiple passes, parameters,
 and shader profiles (OpenGL, Metal, DirectX).
+
+Also includes ISF (Interactive Shader Format) parsing and conversion utilities.
 """
 
 from .generator import KodeProjBuilder
@@ -28,6 +30,15 @@ from .types import (
     Vec3,
     Vec4,
 )
+from .isf_parser import (
+    ISFShader,
+    ISFInput,
+    ISFPass,
+    ISFImported,
+    parse_isf_file,
+    parse_isf_string,
+)
+from .isf_converter import convert_isf_to_kodelife
 
 __version__ = "0.1.0"
 __all__ = [
@@ -53,4 +64,13 @@ __all__ = [
     "create_time_param",
     "create_resolution_param",
     "create_mouse_param",
+    # ISF Parser
+    "ISFShader",
+    "ISFInput",
+    "ISFPass",
+    "ISFImported",
+    "parse_isf_file",
+    "parse_isf_string",
+    # ISF Converter
+    "convert_isf_to_kodelife",
 ]
