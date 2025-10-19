@@ -1,11 +1,9 @@
 """Integration tests for the klproj package."""
 
 import os
-import tempfile
 import xml.etree.ElementTree as ET
 import zlib
 
-import pytest
 from klproj import (
     KodeProjBuilder,
     Parameter,
@@ -16,11 +14,11 @@ from klproj import (
     ShaderSource,
     ShaderStage,
     ShaderStageType,
-    create_shadertoy_params,
-    create_mvp_param,
-    create_time_param,
-    create_resolution_param,
     create_mouse_param,
+    create_mvp_param,
+    create_resolution_param,
+    create_shadertoy_params,
+    create_time_param,
 )
 from klproj.cli import extract_klproj, verify_klproj
 

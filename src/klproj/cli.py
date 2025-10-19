@@ -7,7 +7,6 @@ This module provides CLI commands for working with .klproj files.
 import argparse
 import sys
 import zlib
-from pathlib import Path
 
 
 def extract_klproj(input_path: str, output_path: str) -> int:

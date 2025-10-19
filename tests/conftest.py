@@ -1,9 +1,9 @@
 """Pytest configuration and fixtures for klproj tests."""
 
-import os
 import tempfile
 
 import pytest
+
 from klproj import (
     KodeProjBuilder,
     Parameter,

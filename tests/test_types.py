@@ -1,19 +1,18 @@
 """Tests for klproj.types module."""
 
-import pytest
 from klproj.types import (
-    ShaderProfile,
-    ShaderStageType,
-    PassType,
+    Parameter,
     ParamType,
+    PassType,
+    ProjectProperties,
+    RenderPass,
+    ShaderProfile,
+    ShaderSource,
+    ShaderStage,
+    ShaderStageType,
     Vec2,
     Vec3,
     Vec4,
-    ProjectProperties,
-    Parameter,
-    ShaderSource,
-    ShaderStage,
-    RenderPass,
 )
 
 

@@ -4,9 +4,7 @@ import os
 import tempfile
 import xml.etree.ElementTree as ET
 import zlib
-from pathlib import Path
 
-import pytest
 from klproj.generator import KodeProjBuilder
 from klproj.types import (
     Parameter,
