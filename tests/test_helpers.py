@@ -1,12 +1,11 @@
 """Tests for klproj.helpers module."""
 
-import pytest
 from klproj.helpers import (
-    create_shadertoy_params,
-    create_mvp_param,
-    create_time_param,
-    create_resolution_param,
     create_mouse_param,
+    create_mvp_param,
+    create_resolution_param,
+    create_shadertoy_params,
+    create_time_param,
 )
 from klproj.types import Parameter, ParamType
 
@@ -314,9 +313,7 @@ class TestCreateMouseParam:
 
     def test_combined_custom_options(self):
         """Test creating param with multiple custom options."""
-        param = create_mouse_param(
-            variable_name="customMouse", normalized=True, invert_y=False
-        )
+        param = create_mouse_param(variable_name="customMouse", normalized=True, invert_y=False)
         assert param.variable_name == "customMouse"
         assert param.properties["normalize"] == 1
         assert param.properties["invert"]["y"] == 0

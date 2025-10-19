@@ -274,7 +274,6 @@ class KodeProjBuilder:
             parent: Parent XML element
             stage: ShaderStage to convert to XML
         """
-        from .types import ShaderStage
 
         stage_elem = ET.SubElement(parent, "stage")
         stage_elem.set("type", stage.stage_type.value)

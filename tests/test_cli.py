@@ -1,14 +1,14 @@
 """Tests for klproj.cli module."""
 
 import os
-import sys
 import tempfile
 import zlib
 from io import StringIO
 from unittest.mock import patch
 
 import pytest
-from klproj.cli import extract_klproj, verify_klproj, main
+
+from klproj.cli import extract_klproj, main, verify_klproj
 
 
 class TestExtractKlproj:
@@ -77,7 +77,7 @@ class TestExtractKlproj:
             output_path = os.path.join(tmpdir, "subdir", "output.xml")
             # Create the directory first (as extract doesn't create dirs)
             os.makedirs(os.path.dirname(output_path), exist_ok=True)
-            
+
             result = extract_klproj(input_path, output_path)
             assert result == 0
             assert os.path.exists(output_path)
