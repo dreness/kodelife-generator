@@ -40,6 +40,8 @@ void main() {
 VERTEX_SHADER = """#version 150
 
 in vec4 a_position;
+in vec3 a_normal;
+in vec2 a_texcoord;
 uniform mat4 mvp;
 
 void main() {

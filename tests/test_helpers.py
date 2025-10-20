@@ -381,50 +381,64 @@ class TestCreateFileWatchStage:
 
     def test_returns_shader_stage(self):
         """Test that function returns a ShaderStage."""
-        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, "/path/to/shader.fs")
+        stage = create_file_watch_stage(
+            ShaderStageType.FRAGMENT, "/path/to/shader.fs", shader_code=""
+        )
         assert isinstance(stage, ShaderStage)
 
     def test_stage_type(self):
         """Test that stage type is set correctly."""
-        stage = create_file_watch_stage(ShaderStageType.VERTEX, "/path/to/shader.vs")
+        stage = create_file_watch_stage(
+            ShaderStageType.VERTEX, "/path/to/shader.vs", shader_code=""
+        )
         assert stage.stage_type == ShaderStageType.VERTEX
 
     def test_file_watch_enabled(self):
         """Test that file watching is enabled."""
-        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, "/path/to/shader.fs")
+        stage = create_file_watch_stage(
+            ShaderStageType.FRAGMENT, "/path/to/shader.fs", shader_code=""
+        )
         assert stage.file_watch is True
 
     def test_file_watch_path(self):
         """Test that file watch path is set correctly."""
         path = "/path/to/shader.fs"
-        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, path)
+        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, path, shader_code="")
         assert stage.file_watch_path == path
 
     def test_sources_empty(self):
         """Test that sources list is empty for file watching."""
-        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, "/path/to/shader.fs")
+        stage = create_file_watch_stage(
+            ShaderStageType.FRAGMENT, "/path/to/shader.fs", shader_code=""
+        )
         assert stage.sources == []
 
     def test_enabled_by_default(self):
         """Test that stage is enabled by default."""
-        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, "/path/to/shader.fs")
+        stage = create_file_watch_stage(
+            ShaderStageType.FRAGMENT, "/path/to/shader.fs", shader_code=""
+        )
         assert stage.enabled == 1
 
     def test_not_hidden(self):
         """Test that stage is not hidden by default."""
-        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, "/path/to/shader.fs")
+        stage = create_file_watch_stage(
+            ShaderStageType.FRAGMENT, "/path/to/shader.fs", shader_code=""
+        )
         assert stage.hidden == 0
 
     def test_no_parameters_by_default(self):
         """Test that no parameters are added by default."""
-        stage = create_file_watch_stage(ShaderStageType.FRAGMENT, "/path/to/shader.fs")
+        stage = create_file_watch_stage(
+            ShaderStageType.FRAGMENT, "/path/to/shader.fs", shader_code=""
+        )
         assert stage.parameters == []
 
     def test_custom_parameters(self):
         """Test that custom parameters can be added."""
         params = [create_mvp_param()]
         stage = create_file_watch_stage(
-            ShaderStageType.VERTEX, "/path/to/shader.vs", parameters=params
+            ShaderStageType.VERTEX, "/path/to/shader.vs", parameters=params, shader_code=""
         )
         assert len(stage.parameters) == 1
         assert stage.parameters[0].param_type == ParamType.TRANSFORM_MVP
@@ -435,34 +449,34 @@ class TestCreateVertexFileWatchStage:
 
     def test_returns_shader_stage(self):
         """Test that function returns a ShaderStage."""
-        stage = create_vertex_file_watch_stage("/path/to/shader.vs")
+        stage = create_vertex_file_watch_stage("/path/to/shader.vs", shader_code="")
         assert isinstance(stage, ShaderStage)
 
     def test_stage_type_is_vertex(self):
         """Test that stage type is VERTEX."""
-        stage = create_vertex_file_watch_stage("/path/to/shader.vs")
+        stage = create_vertex_file_watch_stage("/path/to/shader.vs", shader_code="")
         assert stage.stage_type == ShaderStageType.VERTEX
 
     def test_file_watch_enabled(self):
         """Test that file watching is enabled."""
-        stage = create_vertex_file_watch_stage("/path/to/shader.vs")
+        stage = create_vertex_file_watch_stage("/path/to/shader.vs", shader_code="")
         assert stage.file_watch is True
 
     def test_file_watch_path(self):
         """Test that file watch path is set correctly."""
         path = "/path/to/shader.vs"
-        stage = create_vertex_file_watch_stage(path)
+        stage = create_vertex_file_watch_stage(path, shader_code="")
         assert stage.file_watch_path == path
 
     def test_mvp_included_by_default(self):
         """Test that MVP parameter is included by default."""
-        stage = create_vertex_file_watch_stage("/path/to/shader.vs")
+        stage = create_vertex_file_watch_stage("/path/to/shader.vs", shader_code="")
         assert len(stage.parameters) == 1
         assert stage.parameters[0].param_type == ParamType.TRANSFORM_MVP
 
     def test_mvp_can_be_disabled(self):
         """Test that MVP parameter can be disabled."""
-        stage = create_vertex_file_watch_stage("/path/to/shader.vs", mvp=False)
+        stage = create_vertex_file_watch_stage("/path/to/shader.vs", mvp=False, shader_code="")
         assert len(stage.parameters) == 0
 
 
@@ -471,34 +485,36 @@ class TestCreateFragmentFileWatchStage:
 
     def test_returns_shader_stage(self):
         """Test that function returns a ShaderStage."""
-        stage = create_fragment_file_watch_stage("/path/to/shader.fs")
+        stage = create_fragment_file_watch_stage("/path/to/shader.fs", shader_code="")
         assert isinstance(stage, ShaderStage)
 
     def test_stage_type_is_fragment(self):
         """Test that stage type is FRAGMENT."""
-        stage = create_fragment_file_watch_stage("/path/to/shader.fs")
+        stage = create_fragment_file_watch_stage("/path/to/shader.fs", shader_code="")
         assert stage.stage_type == ShaderStageType.FRAGMENT
 
     def test_file_watch_enabled(self):
         """Test that file watching is enabled."""
-        stage = create_fragment_file_watch_stage("/path/to/shader.fs")
+        stage = create_fragment_file_watch_stage("/path/to/shader.fs", shader_code="")
         assert stage.file_watch is True
 
     def test_file_watch_path(self):
         """Test that file watch path is set correctly."""
         path = "/path/to/shader.fs"
-        stage = create_fragment_file_watch_stage(path)
+        stage = create_fragment_file_watch_stage(path, shader_code="")
         assert stage.file_watch_path == path
 
     def test_no_parameters_by_default(self):
         """Test that no parameters are added by default."""
-        stage = create_fragment_file_watch_stage("/path/to/shader.fs")
+        stage = create_fragment_file_watch_stage("/path/to/shader.fs", shader_code="")
         assert stage.parameters == []
 
     def test_custom_parameters(self):
         """Test that custom parameters can be added."""
         params = [create_time_param()]
-        stage = create_fragment_file_watch_stage("/path/to/shader.fs", parameters=params)
+        stage = create_fragment_file_watch_stage(
+            "/path/to/shader.fs", parameters=params, shader_code=""
+        )
         assert len(stage.parameters) == 1
         assert stage.parameters[0].param_type == ParamType.CLOCK
 
@@ -563,8 +579,8 @@ class TestFileWatchIntegration:
 
     def test_vertex_and_fragment_watch_together(self):
         """Test creating both vertex and fragment file watch stages."""
-        vertex = create_vertex_file_watch_stage("/path/to/shader.vs")
-        fragment = create_fragment_file_watch_stage("/path/to/shader.fs")
+        vertex = create_vertex_file_watch_stage("/path/to/shader.vs", shader_code="")
+        fragment = create_fragment_file_watch_stage("/path/to/shader.fs", shader_code="")
 
         assert vertex.stage_type == ShaderStageType.VERTEX
         assert fragment.stage_type == ShaderStageType.FRAGMENT
@@ -574,7 +590,7 @@ class TestFileWatchIntegration:
     def test_mixed_embedded_and_watch(self):
         """Test mixing embedded and file watch stages."""
         vertex = create_default_vertex_stage()
-        fragment = create_fragment_file_watch_stage("/path/to/shader.fs")
+        fragment = create_fragment_file_watch_stage("/path/to/shader.fs", shader_code="")
 
         assert vertex.file_watch is False
         assert fragment.file_watch is True

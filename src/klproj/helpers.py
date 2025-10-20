@@ -184,6 +184,8 @@ def create_file_watch_stage(
     stage_type: ShaderStageType,
     file_path: str,
     parameters: Optional[List[Parameter]] = None,
+    profile: ShaderProfile = ShaderProfile.GL3,
+    shader_code: Optional[str] = None,
 ) -> ShaderStage:
     """
     Create a shader stage that watches an external file.
@@ -192,10 +194,17 @@ def create_file_watch_stage(
     file and reload it when the file changes. This enables using external IDEs
     with KodeLife and allows coding agents to iterate quickly.
 
+    IMPORTANT: KodeLife needs BOTH the initial shader code embedded AND the file
+    watch path set. The initial code is displayed on first load, then the file
+    watcher keeps it in sync with external changes.
+
     Args:
         stage_type: Type of shader stage (VERTEX, FRAGMENT, etc.)
         file_path: Path to the external shader file to watch
         parameters: Optional list of stage-specific parameters
+        profile: Shader profile for the source code (default: GL3)
+        shader_code: Optional shader code. If None (default), reads from file_path.
+                     Pass empty string "" to create empty shader (for testing).
 
     Returns:
         ShaderStage configured for file watching
@@ -213,14 +222,35 @@ def create_file_watch_stage(
             "/path/to/shader.vs",
             parameters=[create_mvp_param()]
         )
+
+        # For testing: with explicit empty sources
+        stage = create_file_watch_stage(
+            ShaderStageType.FRAGMENT,
+            "/path/to/shader.fs",
+            shader_code=""
+        )
     """
+    # Read shader code from file if not provided
+    # KodeLife may need both the initial code AND the file watch path
+    if shader_code is None:
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                shader_code = f.read()
+        except FileNotFoundError as e:
+            raise FileNotFoundError(f"Shader file not found: {file_path}") from e
+        except Exception as e:
+            raise RuntimeError(f"Error reading shader file {file_path}: {e}") from e
+
+    # Create shader source with content (if any)
+    sources = [ShaderSource(profile=profile, code=shader_code)] if shader_code else []
+
     return ShaderStage(
         stage_type=stage_type,
         enabled=1,
         hidden=0,
         file_watch=True,
         file_watch_path=file_path,
-        sources=[],
+        sources=sources,
         parameters=parameters or [],
     )
 
@@ -228,6 +258,7 @@ def create_file_watch_stage(
 def create_vertex_file_watch_stage(
     file_path: str,
     mvp: bool = True,
+    shader_code: Optional[str] = None,
 ) -> ShaderStage:
     """
     Create a vertex shader stage that watches an external file.
@@ -238,6 +269,8 @@ def create_vertex_file_watch_stage(
     Args:
         file_path: Path to the external vertex shader file (.vs)
         mvp: Whether to include MVP matrix parameter (default: True)
+        shader_code: Optional shader code. If None, reads from file_path.
+                     If provided (including empty string), uses this instead.
 
     Returns:
         Vertex ShaderStage configured for file watching
@@ -250,12 +283,14 @@ def create_vertex_file_watch_stage(
         ShaderStageType.VERTEX,
         file_path,
         parameters=params,
+        shader_code=shader_code,
     )
 
 
 def create_fragment_file_watch_stage(
     file_path: str,
     parameters: Optional[List[Parameter]] = None,
+    shader_code: Optional[str] = None,
 ) -> ShaderStage:
     """
     Create a fragment shader stage that watches an external file.
@@ -265,6 +300,8 @@ def create_fragment_file_watch_stage(
     Args:
         file_path: Path to the external fragment shader file (.fs)
         parameters: Optional list of fragment-specific parameters
+        shader_code: Optional shader code. If None, reads from file_path.
+                     If provided (including empty string), uses this instead.
 
     Returns:
         Fragment ShaderStage configured for file watching
@@ -276,6 +313,7 @@ def create_fragment_file_watch_stage(
         ShaderStageType.FRAGMENT,
         file_path,
         parameters=parameters,
+        shader_code=shader_code,
     )
 
 
@@ -301,14 +339,13 @@ def create_default_vertex_stage(
     # Default vertex shader code based on profile
     if profile in [ShaderProfile.GL3, ShaderProfile.GL2]:
         code = """#version 150
-in vec3 vertexPosition;
-in vec2 vertexTexCoord;
-out vec2 texCoord;
+in vec4 a_position;
+in vec3 a_normal;
+in vec2 a_texcoord;
 uniform mat4 mvp;
 
 void main() {
-    gl_Position = mvp * vec4(vertexPosition, 1.0);
-    texCoord = vertexTexCoord;
+    gl_Position = mvp * a_position;
 }
 """
     elif profile == ShaderProfile.MTL:
