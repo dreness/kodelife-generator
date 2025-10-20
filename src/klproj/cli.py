@@ -1,10 +1,16 @@
 """
 Command-line interface for klproj tools.
 
-This module provides CLI commands for working with .klproj files.
+This module provides CLI commands for working with .klproj files:
+- extract: Decompress .klproj to XML
+- verify: Display .klproj contents
+- convert: Convert ISF shaders to .klproj format
+  - Accepts individual ISF files or JSON files from find_shaders.py
+  - JSON format: {"multipass": [...], "single_pass": [...]}
 """
 
 import argparse
+import json
 import sys
 import zlib
 from pathlib import Path
@@ -59,6 +65,38 @@ def verify_klproj(filename: str) -> int:
         return 1
 
 
+def load_paths_from_json(json_path: str) -> list:
+    """
+    Load ISF shader paths from a JSON file created by find_shaders.py.
+
+    Args:
+        json_path: Path to JSON file
+
+    Returns:
+        List of ISF file paths (strings)
+    """
+    with open(json_path, "r") as f:
+        data = json.load(f)
+
+    paths = []
+
+    # Extract multipass shader paths
+    if "multipass" in data:
+        for shader in data["multipass"]:
+            if isinstance(shader, dict) and "path" in shader:
+                paths.append(shader["path"])
+            elif isinstance(shader, str):
+                paths.append(shader)
+
+    # Extract single-pass shader paths
+    if "single_pass" in data:
+        for path in data["single_pass"]:
+            if isinstance(path, str):
+                paths.append(path)
+
+    return paths
+
+
 def convert_isf(
     input_files: list,
     output_dir: str = None,
@@ -70,7 +108,7 @@ def convert_isf(
     Convert ISF file(s) to .klproj format.
 
     Args:
-        input_files: List of ISF file paths
+        input_files: List of ISF file paths or JSON files from find_shaders.py
         output_dir: Optional output directory (default: same as input)
         width: Project width in pixels
         height: Project height in pixels
@@ -82,7 +120,21 @@ def convert_isf(
     success_count = 0
     error_count = 0
 
+    # Expand JSON files into ISF paths
+    expanded_files = []
     for input_file in input_files:
+        if input_file.endswith(".json"):
+            try:
+                json_paths = load_paths_from_json(input_file)
+                print(f"Loaded {len(json_paths)} shader paths from {input_file}")
+                expanded_files.extend(json_paths)
+            except Exception as e:
+                print(f"✗ Error loading JSON file {input_file}: {e}", file=sys.stderr)
+                error_count += 1
+        else:
+            expanded_files.append(input_file)
+
+    for input_file in expanded_files:
         try:
             # Determine output path
             if output_dir:
@@ -109,7 +161,7 @@ def convert_isf(
             error_count += 1
 
     # Print summary if multiple files
-    if len(input_files) > 1:
+    if len(expanded_files) > 1:
         print(f"\nSummary: {success_count} succeeded, {error_count} failed")
 
     return 0 if error_count == 0 else 1
@@ -134,8 +186,14 @@ def main():
     verify_parser.add_argument("input", help="Input .klproj file")
 
     # Convert command
-    convert_parser = subparsers.add_parser("convert", help="Convert ISF file(s) to .klproj format")
-    convert_parser.add_argument("inputs", nargs="+", help="Input ISF file(s)")
+    convert_parser = subparsers.add_parser(
+        "convert",
+        help="Convert ISF file(s) to .klproj format",
+        description="Convert ISF shader files or JSON file lists to .klproj format",
+    )
+    convert_parser.add_argument(
+        "inputs", nargs="+", help="Input ISF file(s) or JSON file from find_shaders.py"
+    )
     convert_parser.add_argument(
         "-o", "--output-dir", help="Output directory (default: same as input file)"
     )

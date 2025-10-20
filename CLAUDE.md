@@ -52,6 +52,12 @@ uv run klproj convert shader1.fs shader2.fs -o output/    # Convert multiple fil
 uv run klproj convert shader.fs -w 1280 --height 720      # Custom dimensions
 uv run klproj convert shader.fs -a GL2                    # Use GL2 profile
 
+# Convert from JSON file list (created by tools/find_shaders.py)
+uv run klproj convert multipass_isf_shaders.json -o output/
+
+# Mix JSON and direct files
+uv run klproj convert shader_list.json shader.fs -o output/
+
 # Extract .klproj to XML
 uv run klproj extract input.klproj output.xml
 
