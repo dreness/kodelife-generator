@@ -1,5 +1,7 @@
 # KodeLife Project Generator
 
+[![CI](https://github.com/dreness/kodelife-generator/actions/workflows/ci.yml/badge.svg)](https://github.com/dreness/kodelife-generator/actions/workflows/ci.yml)
+
 A Python library for creating [KodeLife](https://hexler.net/kodelife) `.klproj` files programmatically. Build shader projects with multiple passes, parameters, and shader profiles (OpenGL, Metal, DirectX) using a clean, well-documented Python API.
 
 ## Features
