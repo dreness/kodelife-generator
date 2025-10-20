@@ -14,25 +14,24 @@ ISF Specification References:
 - Multi-pass: docs/ISF/isf-docs/pages/ref/ref_multipass.md
 """
 
-from typing import List, Optional
 import os
+from typing import List, Optional
 
-from .isf_parser import ISFShader, ISFInput, parse_isf_file
 from .generator import KodeProjBuilder
+from .helpers import create_mvp_param
+from .isf_parser import ISFInput, ISFShader, parse_isf_file
 from .types import (
     Parameter,
     ParamType,
-    ShaderProfile,
-    ShaderStageType,
     PassType,
+    RenderPass,
+    ShaderProfile,
     ShaderSource,
     ShaderStage,
-    RenderPass,
+    ShaderStageType,
     Vec2,
     Vec4,
 )
-from .helpers import create_mvp_param
-
 
 # ISF to KodeLife parameter type mapping
 # ISF input types: docs/ISF/isf-docs/pages/ref/ref_json.md (TYPE values)
@@ -321,7 +320,6 @@ def evaluate_pass_dimension(expression, width: int, height: int) -> int:
     Returns:
         Evaluated dimension as integer
     """
-    import re
     import math
 
     if expression is None:
@@ -394,7 +392,7 @@ def adapt_isf_vertex_shader_code(vertex_code: str, parameters: List[Parameter], 
         # Remove the #if/#else/#endif structure and keep only the 'out' declarations
         def replace_conditional_varying(match):
             # Extract the varying and in/out declarations
-            varying_decl = match.group(1).strip()
+            match.group(1).strip()
             out_decl = match.group(2).strip()
             # Return the 'out' declaration for GL3
             return out_decl
@@ -660,7 +658,7 @@ def convert_isf_to_kodelife(
 
     if isf_shader.passes:
         # Multipass shader
-        for pass_idx, isf_pass in enumerate(isf_shader.passes):
+        for _pass_idx, isf_pass in enumerate(isf_shader.passes):
             if isf_pass.target:
                 # Create a texture parameter for this buffer
                 # Use FRAME_PREV_PASS for persistent buffers to get feedback from previous frame

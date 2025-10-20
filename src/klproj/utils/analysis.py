@@ -11,7 +11,7 @@ import subprocess
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Dict, Optional, Set, Callable
+from typing import Callable, Dict, List, Optional, Set
 
 
 @dataclass
@@ -412,7 +412,7 @@ class KlprojAnalyzer:
         """Extract declared and used variables from shader code."""
         # Find uniform declarations
         uniform_pattern = r'uniform\s+(?:highp|mediump|lowp)?\s*(\w+)\s+(\w+)'
-        uniforms = set(match[1] for match in re.findall(uniform_pattern, shader_code))
+        uniforms = {match[1] for match in re.findall(uniform_pattern, shader_code)}
 
         # Find const declarations
         const_pattern = r'const\s+(?:highp|mediump|lowp)?\s*\w+\s+(\w+)'

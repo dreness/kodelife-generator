@@ -3,15 +3,15 @@ Tests for ISF parser and converter functionality.
 """
 
 import os
-import tempfile
-import pytest
-from klproj.isf_parser import parse_isf_string, parse_isf_file, ISFShader
-from klproj.isf_converter import (
-    convert_isf_to_kodelife,
-    convert_isf_input_to_parameter,
-    adapt_isf_shader_code,
-)
 
+import pytest
+
+from klproj.isf_converter import (
+    adapt_isf_shader_code,
+    convert_isf_input_to_parameter,
+    convert_isf_to_kodelife,
+)
+from klproj.isf_parser import ISFShader, parse_isf_file, parse_isf_string
 
 # Sample ISF shaders for testing
 SIMPLE_ISF = """/*
@@ -308,8 +308,6 @@ class TestISFConverter:
 
     def test_adapt_shader_code(self):
         """Test shader code adaptation."""
-        from klproj.isf_parser import ISFShader
-        from klproj.types import Parameter, ParamType
 
         shader = ISFShader()
         # Empty parameters list for simple test
@@ -329,7 +327,6 @@ class TestISFConverter:
 
     def test_uniform_declarations_generation(self):
         """Test that uniform declarations are generated for parameters."""
-        from klproj.isf_parser import ISFShader
         from klproj.types import Parameter, ParamType
 
         shader = ISFShader()
@@ -356,7 +353,6 @@ class TestISFConverter:
 
     def test_isf_built_in_replacements(self):
         """Test replacement of ISF-specific built-ins and macros."""
-        from klproj.isf_parser import ISFShader
 
         shader = ISFShader()
         params = []  # Empty for this test
@@ -374,7 +370,6 @@ void main() {
 
     def test_img_norm_pixel_replacement(self):
         """Test IMG_NORM_PIXEL macro replacement."""
-        from klproj.isf_parser import ISFShader
 
         shader = ISFShader()
         params = []  # Empty for this test
@@ -392,7 +387,6 @@ void main() {
 
     def test_img_pixel_replacement(self):
         """Test IMG_PIXEL macro replacement."""
-        from klproj.isf_parser import ISFShader
 
         shader = ISFShader()
         params = []  # Empty for this test
@@ -410,7 +404,6 @@ void main() {
 
     def test_img_size_replacement(self):
         """Test IMG_SIZE macro replacement."""
-        from klproj.isf_parser import ISFShader
 
         shader = ISFShader()
         params = []  # Empty for this test
@@ -428,7 +421,6 @@ void main() {
 
     def test_img_this_pixel_replacement(self):
         """Test IMG_THIS_PIXEL macro replacement."""
-        from klproj.isf_parser import ISFShader
 
         shader = ISFShader()
         params = []  # Empty for this test
@@ -445,7 +437,6 @@ void main() {
 
     def test_multiple_isf_replacements(self):
         """Test shader with multiple ISF built-ins."""
-        from klproj.isf_parser import ISFShader
 
         shader = ISFShader()
         params = []  # Empty for this test
@@ -475,7 +466,6 @@ void main() {
 
     def test_boolean_comparison_replacements(self):
         """Test replacement of boolean comparisons (ISF bools are converted to floats)."""
-        from klproj.isf_parser import ISFShader
         from klproj.types import Parameter, ParamType
 
         shader = ISFShader()
@@ -585,7 +575,6 @@ void main() {
 
     def test_img_norm_this_pixel_replacement(self):
         """Test IMG_NORM_THIS_PIXEL macro replacement."""
-        from klproj.isf_parser import ISFShader
 
         shader = ISFShader()
         params = []  # Empty for this test

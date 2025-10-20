@@ -97,12 +97,12 @@ class DiscoveryReporter:
             pass_counts = [shader.num_passes for shader in multipass]
             avg_passes = sum(pass_counts) / len(pass_counts)
             max_passes = max(pass_counts)
-            print(f"\nMultipass statistics:")
+            print("\nMultipass statistics:")
             print(f"  Average passes: {avg_passes:.1f}")
             print(f"  Maximum passes: {max_passes}")
 
         if categories:
-            print(f"\nShaders by category:")
+            print("\nShaders by category:")
             sorted_cats = sorted(categories.items(), key=lambda x: -x[1])
             for category, count in sorted_cats[:10]:
                 print(f"  • {category}: {count}")

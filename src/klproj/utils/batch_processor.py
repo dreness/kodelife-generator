@@ -6,10 +6,9 @@ with progress tracking, error handling, and result reporting.
 """
 
 import json
-import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Callable, Union
+from typing import Callable, List, Optional, Union
 
 from ..isf_converter import convert_isf_to_kodelife
 from .isf_discovery import ISFInfo
@@ -167,7 +166,7 @@ class BatchConverter:
 
         # Check if output already exists and we're not overwriting
         if output_path.exists() and not self.overwrite:
-            return False, None, f"Output file already exists (use --overwrite to replace)"
+            return False, None, "Output file already exists (use --overwrite to replace)"
 
         try:
             # Convert the file

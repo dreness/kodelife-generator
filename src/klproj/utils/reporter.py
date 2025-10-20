@@ -205,7 +205,7 @@ class ConversionReporter:
 
         # Show statistics
         if stats:
-            print(f"\nOutput statistics:")
+            print("\nOutput statistics:")
             print(f"  Directory: {stats.get('output_dir', 'N/A')}")
             if 'total_size_mb' in stats:
                 print(f"  Total size: {stats['total_size_mb']:.2f} MB")

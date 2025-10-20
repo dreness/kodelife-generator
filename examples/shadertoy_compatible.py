@@ -9,14 +9,14 @@ and supports multiple shader profiles.
 
 from klproj import (
     KodeProjBuilder,
-    RenderPass,
     PassType,
+    RenderPass,
+    ShaderProfile,
+    ShaderSource,
     ShaderStage,
     ShaderStageType,
-    ShaderSource,
-    ShaderProfile,
-    create_shadertoy_params,
     create_mvp_param,
+    create_shadertoy_params,
 )
 
 # GLSL 150 (OpenGL 3.x) Fragment Shader
@@ -41,18 +41,18 @@ void main() {
 // Shadertoy main function
 void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 uv = fragCoord / iResolution.xy;
-    
+
     // Create animated pattern
     vec2 p = uv * 2.0 - 1.0;
     float d = length(p);
     float a = atan(p.y, p.x);
-    
+
     // Animated colors
     vec3 col = 0.5 + 0.5 * cos(iTime + a + vec3(0, 2, 4));
-    
+
     // Radial pattern
     col *= smoothstep(0.8, 0.2, d);
-    
+
     fragColor = vec4(col, 1.0);
 }
 """
@@ -94,14 +94,14 @@ fragment PS_OUTPUT ps_main(
 
 void mainImage(thread float4& fragColor, float2 fragCoord, constant PS_UNIFORM& u) {
     float2 uv = fragCoord / u.iResolution.xy;
-    
+
     float2 p = uv * 2.0 - 1.0;
     float d = length(p);
     float a = atan2(p.y, p.x);
-    
+
     float3 col = 0.5 + 0.5 * cos(u.iTime + a + float3(0, 2, 4));
     col *= smoothstep(0.8, 0.2, d);
-    
+
     fragColor = float4(col, 1.0);
 }
 """
@@ -130,10 +130,10 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     vec2 p = uv * 2.0 - 1.0;
     float d = length(p);
     float a = atan(p.y, p.x);
-    
+
     vec3 col = 0.5 + 0.5 * cos(iTime + a + vec3(0, 2, 4));
     col *= smoothstep(0.8, 0.2, d);
-    
+
     fragColor = vec4(col, 1.0);
 }
 """

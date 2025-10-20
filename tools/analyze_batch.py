@@ -41,7 +41,7 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from klproj.utils.analysis import KlprojAnalyzer, BatchAnalysisResult
+from klproj.utils.analysis import BatchAnalysisResult, KlprojAnalyzer
 
 
 class AnalysisReporter:
@@ -81,7 +81,7 @@ class AnalysisReporter:
         warnings = [i for i in result.issues if i.severity == 'warning']
 
         if not errors and not warnings:
-            print(f"   ✓ No issues found")
+            print("   ✓ No issues found")
             if self.verbose and result.info:
                 for key, value in result.info.items():
                     print(f"      {key}: {value}")
@@ -113,13 +113,13 @@ class AnalysisReporter:
         print(f"  ⚠  Files with warnings: {result.files_with_warnings}")
         print(f"  ✓ Files without issues: {result.total_files - result.files_with_errors - result.files_with_warnings}")
 
-        print(f"\nTotal issues:")
+        print("\nTotal issues:")
         print(f"  ✗ Errors: {result.total_errors}")
         print(f"  ⚠  Warnings: {result.total_warnings}")
 
         # Show most problematic files
         if result.files_with_errors > 0 and not self.quiet:
-            print(f"\nFiles with most errors:")
+            print("\nFiles with most errors:")
             sorted_files = sorted(
                 result.file_results.items(),
                 key=lambda x: x[1].error_count,
@@ -137,7 +137,7 @@ class AnalysisReporter:
                     category_counts[issue.category] = category_counts.get(issue.category, 0) + 1
 
             if category_counts:
-                print(f"\nIssues by category:")
+                print("\nIssues by category:")
                 for category, count in sorted(category_counts.items(), key=lambda x: -x[1]):
                     print(f"  • {category}: {count}")
 

@@ -13,7 +13,7 @@ ISF Specification References:
 import json
 import re
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Any
+from typing import Any, List, Optional
 
 
 @dataclass
@@ -135,7 +135,7 @@ def parse_isf_string(content: str) -> ISFShader:
     try:
         metadata = json.loads(json_str)
     except json.JSONDecodeError as e:
-        raise ValueError(f"Invalid JSON metadata in ISF file: {e}")
+        raise ValueError(f"Invalid JSON metadata in ISF file: {e}") from e
 
     # Extract shader code (everything after the JSON comment)
     shader_code = content[json_match.end():].strip()

@@ -8,14 +8,14 @@ This demonstrates the structure required for Metal shaders in KodeLife.
 
 from klproj import (
     KodeProjBuilder,
-    RenderPass,
     PassType,
+    RenderPass,
+    ShaderProfile,
+    ShaderSource,
     ShaderStage,
     ShaderStageType,
-    ShaderSource,
-    ShaderProfile,
-    create_resolution_param,
     create_mvp_param,
+    create_resolution_param,
 )
 
 # Metal vertex shader
@@ -74,12 +74,12 @@ fragment PS_OUTPUT ps_main(
     constant PS_UNIFORM& u [[buffer(16)]]
 ) {
     PS_OUTPUT out;
-    
+
     // Use texture coordinates for gradient
     float2 uv = input.v_texcoord;
     float3 color = float3(uv.x, uv.y, 0.5);
     out.color = float4(color, 1.0);
-    
+
     return out;
 }
 """

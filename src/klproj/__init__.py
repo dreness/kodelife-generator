@@ -16,6 +16,15 @@ from .helpers import (
     create_shadertoy_params,
     create_time_param,
 )
+from .isf_converter import convert_isf_to_kodelife
+from .isf_parser import (
+    ISFImported,
+    ISFInput,
+    ISFPass,
+    ISFShader,
+    parse_isf_file,
+    parse_isf_string,
+)
 from .types import (
     Parameter,
     ParamType,
@@ -30,15 +39,6 @@ from .types import (
     Vec3,
     Vec4,
 )
-from .isf_parser import (
-    ISFShader,
-    ISFInput,
-    ISFPass,
-    ISFImported,
-    parse_isf_file,
-    parse_isf_string,
-)
-from .isf_converter import convert_isf_to_kodelife
 
 __version__ = "0.1.0"
 __all__ = [

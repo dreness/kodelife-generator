@@ -7,6 +7,7 @@ This module provides CLI commands for working with .klproj files.
 import argparse
 import sys
 import zlib
+from pathlib import Path
 
 from .isf_converter import convert_isf_to_kodelife
 

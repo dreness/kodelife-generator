@@ -45,8 +45,8 @@ from pathlib import Path
 # Add src to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
 
-from klproj.utils.isf_discovery import ISFDiscovery
 from klproj.utils.batch_processor import BatchConverter
+from klproj.utils.isf_discovery import ISFDiscovery
 from klproj.utils.reporter import ConversionReporter
 
 
