@@ -305,7 +305,8 @@ class ShaderStage:
 
     A shader stage represents one step in the graphics pipeline (e.g., vertex,
     fragment, compute). Each stage can have multiple source code implementations
-    for different shader profiles.
+    for different shader profiles, OR it can reference an external file for
+    live-reload/file-watching workflow.
 
     Attributes:
         stage_type: Type of shader stage (from ShaderStageType enum)
@@ -313,9 +314,16 @@ class ShaderStage:
         hidden: Whether this stage is hidden in UI (1) or visible (0)
         sources: List of shader source code for different profiles
         parameters: List of stage-specific parameters
+        file_watch: Whether to watch an external file for changes (default: False)
+        file_watch_path: Path to external shader file to watch (default: "")
+
+    File Watching:
+        When file_watch=True and file_watch_path is set, KodeLife will load
+        shader code from the external file and reload it on changes. This
+        enables using external IDEs and allows coding agents to iterate quickly.
 
     Example:
-        # Fragment shader with GL3 and Metal sources
+        # Fragment shader with embedded source code
         fragment_stage = ShaderStage(
             stage_type=ShaderStageType.FRAGMENT,
             enabled=1,
@@ -326,6 +334,15 @@ class ShaderStage:
             ],
             parameters=[]
         )
+
+        # Fragment shader with file watching
+        fragment_stage = ShaderStage(
+            stage_type=ShaderStageType.FRAGMENT,
+            enabled=1,
+            file_watch=True,
+            file_watch_path="/path/to/shader.fs",
+            sources=[]  # Sources can be empty when file watching
+        )
     """
 
     stage_type: ShaderStageType
@@ -333,6 +350,8 @@ class ShaderStage:
     hidden: int = 0
     sources: List[ShaderSource] = field(default_factory=list)
     parameters: List[Parameter] = field(default_factory=list)
+    file_watch: bool = False
+    file_watch_path: str = ""
 
 
 @dataclass

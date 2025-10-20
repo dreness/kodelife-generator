@@ -7,6 +7,7 @@ This module provides CLI commands for working with .klproj files:
 - convert: Convert ISF shaders to .klproj format
   - Accepts individual ISF files or JSON files from find_shaders.py
   - JSON format: {"multipass": [...], "single_pass": [...]}
+- create: Create .klproj with file watching for external shader files
 """
 
 import argparse
@@ -15,7 +16,15 @@ import sys
 import zlib
 from pathlib import Path
 
+from .generator import KodeProjBuilder
+from .helpers import (
+    create_default_vertex_stage,
+    create_fragment_file_watch_stage,
+    create_shadertoy_params,
+    create_vertex_file_watch_stage,
+)
 from .isf_converter import convert_isf_to_kodelife
+from .types import PassType, RenderPass, ShaderProfile
 
 
 def extract_klproj(input_path: str, output_path: str) -> int:
@@ -167,6 +176,97 @@ def convert_isf(
     return 0 if error_count == 0 else 1
 
 
+def create_watch_project(
+    fragment_shader: str,
+    vertex_shader: str = None,
+    output_path: str = None,
+    width: int = 1920,
+    height: int = 1080,
+    api: str = "GL3",
+) -> int:
+    """
+    Create a .klproj that watches external shader files.
+
+    This creates a KodeLife project configured to watch and reload shader
+    files from disk. This enables using external IDEs and allows coding
+    agents to iterate quickly.
+
+    Args:
+        fragment_shader: Path to fragment shader file (.fs)
+        vertex_shader: Optional path to vertex shader file (.vs)
+        output_path: Output .klproj path (default: based on fragment shader name)
+        width: Project width in pixels
+        height: Project height in pixels
+        api: Graphics API to use (GL3, GL2, MTL)
+
+    Returns:
+        0 on success, 1 on error
+    """
+    try:
+        # Convert paths to absolute paths
+        fragment_path = str(Path(fragment_shader).resolve())
+
+        # Determine output path
+        if not output_path:
+            base_name = Path(fragment_shader).stem
+            output_path = f"{base_name}_watch.klproj"
+
+        # Ensure output directory exists
+        output_dir = Path(output_path).parent
+        if output_dir != Path("."):
+            output_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create builder
+        profile = ShaderProfile[api] if hasattr(ShaderProfile, api) else ShaderProfile.GL3
+        builder = KodeProjBuilder(api=api)
+        builder.set_resolution(width, height)
+        builder.set_author("klproj-generator")
+        builder.set_comment(f"File-watching project for {Path(fragment_shader).name}")
+
+        # Add standard parameters
+        for param in create_shadertoy_params():
+            builder.add_global_param(param)
+
+        # Create vertex stage
+        if vertex_shader:
+            vertex_path = str(Path(vertex_shader).resolve())
+            vertex_stage = create_vertex_file_watch_stage(vertex_path)
+        else:
+            # Use default embedded vertex shader
+            vertex_stage = create_default_vertex_stage(profile)
+
+        # Create fragment stage with file watching
+        fragment_stage = create_fragment_file_watch_stage(fragment_path)
+
+        # Create render pass
+        render_pass = RenderPass(
+            pass_type=PassType.RENDER,
+            label="Main Pass",
+            enabled=1,
+            stages=[vertex_stage, fragment_stage],
+            width=width,
+            height=height,
+        )
+
+        builder.add_pass(render_pass)
+        builder.save(output_path)
+
+        print(f"✓ Created file-watching project: {output_path}")
+        print(f"  Fragment shader: {fragment_path}")
+        if vertex_shader:
+            print(f"  Vertex shader: {vertex_path}")
+        else:
+            print("  Vertex shader: (embedded default)")
+        return 0
+
+    except Exception as e:
+        print(f"✗ Error creating project: {e}", file=sys.stderr)
+        import traceback
+
+        traceback.print_exc()
+        return 1
+
+
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
@@ -207,6 +307,35 @@ def main():
         "-a", "--api", choices=["GL2", "GL3"], default="GL3", help="Graphics API (default: GL3)"
     )
 
+    # Create command (file watching)
+    create_parser = subparsers.add_parser(
+        "create",
+        help="Create .klproj with file watching for external shaders",
+        description="Create a KodeLife project that watches external shader files for live reloading",
+    )
+    create_parser.add_argument("fragment", help="Fragment shader file (.fs) to watch")
+    create_parser.add_argument(
+        "-v",
+        "--vertex",
+        help="Vertex shader file (.vs) to watch (optional, default embedded shader used)",
+    )
+    create_parser.add_argument(
+        "-o", "--output", help="Output .klproj path (default: <fragment_name>_watch.klproj)"
+    )
+    create_parser.add_argument(
+        "-w", "--width", type=int, default=1920, help="Project width in pixels (default: 1920)"
+    )
+    create_parser.add_argument(
+        "--height", type=int, default=1080, help="Project height in pixels (default: 1080)"
+    )
+    create_parser.add_argument(
+        "-a",
+        "--api",
+        choices=["GL2", "GL3", "MTL"],
+        default="GL3",
+        help="Graphics API (default: GL3)",
+    )
+
     args = parser.parse_args()
 
     if args.command == "extract":
@@ -217,6 +346,15 @@ def main():
         return convert_isf(
             input_files=args.inputs,
             output_dir=args.output_dir,
+            width=args.width,
+            height=args.height,
+            api=args.api,
+        )
+    elif args.command == "create":
+        return create_watch_project(
+            fragment_shader=args.fragment,
+            vertex_shader=args.vertex,
+            output_path=args.output,
             width=args.width,
             height=args.height,
             api=args.api,
