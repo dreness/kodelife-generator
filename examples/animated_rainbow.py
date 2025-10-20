@@ -8,15 +8,15 @@ This is a great starting point for animated shaders.
 
 from klproj import (
     KodeProjBuilder,
-    RenderPass,
     PassType,
+    RenderPass,
+    ShaderProfile,
+    ShaderSource,
     ShaderStage,
     ShaderStageType,
-    ShaderSource,
-    ShaderProfile,
+    create_mvp_param,
     create_resolution_param,
     create_time_param,
-    create_mvp_param,
 )
 
 # Fragment shader - animated rainbow effect
@@ -30,11 +30,11 @@ uniform float time;
 void main() {
     // Normalized coordinates
     vec2 uv = gl_FragCoord.xy / resolution;
-    
+
     // Animated rainbow using cosine palette
     // This creates smooth color cycling based on position and time
     vec3 color = 0.5 + 0.5 * cos(time + uv.xyx + vec3(0, 2, 4));
-    
+
     fragColor = vec4(color, 1.0);
 }
 """

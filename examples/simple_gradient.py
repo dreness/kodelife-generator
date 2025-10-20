@@ -8,14 +8,14 @@ requirements for a KodeLife project.
 
 from klproj import (
     KodeProjBuilder,
-    RenderPass,
     PassType,
+    RenderPass,
+    ShaderProfile,
+    ShaderSource,
     ShaderStage,
     ShaderStageType,
-    ShaderSource,
-    ShaderProfile,
-    create_resolution_param,
     create_mvp_param,
+    create_resolution_param,
 )
 
 # Fragment shader - creates a simple gradient
@@ -28,10 +28,10 @@ uniform vec2 resolution;
 void main() {
     // Normalized coordinates (0 to 1)
     vec2 uv = gl_FragCoord.xy / resolution;
-    
+
     // Simple gradient from red-green (left) to blue (right)
     vec3 color = vec3(uv.x, uv.y, 0.5);
-    
+
     fragColor = vec4(color, 1.0);
 }
 """

@@ -17,18 +17,21 @@ A Python library for creating [KodeLife](https://hexler.net/kodelife) `.klproj` 
 
 ### Installation
 
+This project uses [uv](https://github.com/astral-sh/uv) for Python package management. Install it first:
+
 ```bash
+# Install uv (if not already installed)
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
 # Clone the repository
 git clone <repository-url>
 cd kodelife-generator
 
-# Create virtual environment with uv (or use pip)
-uv venv
-source .venv/bin/activate  # On Windows: .venv\Scripts\activate
-
-# Install the package
+# Install the package in development mode
 uv pip install -e .
 ```
+
+> **Note**: All commands in this README use `uv run` which automatically manages the virtual environment for you.
 
 ### Your First Shader
 
@@ -36,7 +39,7 @@ Run an example to verify installation:
 
 ```bash
 cd examples
-python simple_gradient.py
+uv run python simple_gradient.py
 ```
 
 This creates [`simple_gradient.klproj`](examples/simple_gradient.py) - open it in KodeLife!
@@ -106,7 +109,7 @@ print("✓ Created my_shader.klproj - open it in KodeLife!")
 Run it:
 
 ```bash
-python my_shader.py
+uv run python my_shader.py
 ```
 
 ## Common Tasks
@@ -168,8 +171,8 @@ Check the [`examples/`](examples/) directory for complete, runnable examples:
 
 ```bash
 cd examples
-python animated_rainbow.py
-python shadertoy_template.py
+uv run python animated_rainbow.py
+uv run python shadertoy_template.py
 ```
 
 ### Tutorials
@@ -182,11 +185,17 @@ python shadertoy_template.py
 The package includes command-line tools for working with `.klproj` files:
 
 ```bash
+# Convert ISF file(s) to .klproj
+uv run klproj convert shader.fs                           # Output to same directory
+uv run klproj convert shader1.fs shader2.fs -o output/    # Convert multiple files
+uv run klproj convert shader.fs -w 1280 --height 720      # Custom dimensions
+uv run klproj convert shader.fs -a GL2                    # Use GL2 profile
+
 # Extract a .klproj file to XML
-klproj extract input.klproj output.xml
+uv run klproj extract input.klproj output.xml
 
 # Verify a .klproj file
-klproj verify myshader.klproj
+uv run klproj verify myshader.klproj
 ```
 
 ## API Overview

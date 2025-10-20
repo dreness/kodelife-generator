@@ -1,5 +1,6 @@
 """Tests for klproj.cli module."""
 
+import json
 import os
 import tempfile
 import zlib
@@ -8,7 +9,7 @@ from unittest.mock import patch
 
 import pytest
 
-from klproj.cli import extract_klproj, main, verify_klproj
+from klproj.cli import extract_klproj, load_paths_from_json, main, verify_klproj
 
 
 class TestExtractKlproj:
@@ -348,3 +349,217 @@ class TestCLIHelpers:
             assert result == 0
             output = captured_output.getvalue()
             assert len(output) > 10000  # Should have decompressed the large content
+
+
+class TestLoadPathsFromJSON:
+    """Test load_paths_from_json function."""
+
+    def test_load_multipass_shaders(self):
+        """Test loading multipass shader paths from JSON."""
+        test_data = {
+            "multipass": [
+                {"path": "/path/to/shader1.fs"},
+                {"path": "/path/to/shader2.fs"},
+            ],
+            "single_pass": [],
+            "summary": {"total": 2},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = os.path.join(tmpdir, "test.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            paths = load_paths_from_json(json_path)
+            assert len(paths) == 2
+            assert "/path/to/shader1.fs" in paths
+            assert "/path/to/shader2.fs" in paths
+
+    def test_load_single_pass_shaders(self):
+        """Test loading single-pass shader paths from JSON."""
+        test_data = {
+            "multipass": [],
+            "single_pass": ["/path/to/shader3.fs", "/path/to/shader4.fs"],
+            "summary": {"total": 2},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = os.path.join(tmpdir, "test.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            paths = load_paths_from_json(json_path)
+            assert len(paths) == 2
+            assert "/path/to/shader3.fs" in paths
+            assert "/path/to/shader4.fs" in paths
+
+    def test_load_mixed_shaders(self):
+        """Test loading both multipass and single-pass shaders."""
+        test_data = {
+            "multipass": [
+                {"path": "/path/to/multi1.fs"},
+                {"path": "/path/to/multi2.fs"},
+            ],
+            "single_pass": ["/path/to/single1.fs", "/path/to/single2.fs"],
+            "summary": {"total": 4},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = os.path.join(tmpdir, "test.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            paths = load_paths_from_json(json_path)
+            assert len(paths) == 4
+            assert "/path/to/multi1.fs" in paths
+            assert "/path/to/single1.fs" in paths
+
+    def test_load_empty_json(self):
+        """Test loading JSON with no shaders."""
+        test_data = {"multipass": [], "single_pass": [], "summary": {"total": 0}}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = os.path.join(tmpdir, "test.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            paths = load_paths_from_json(json_path)
+            assert len(paths) == 0
+
+    def test_load_json_with_missing_keys(self):
+        """Test loading JSON with missing keys."""
+        test_data = {"summary": {"total": 0}}
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = os.path.join(tmpdir, "test.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            paths = load_paths_from_json(json_path)
+            assert len(paths) == 0
+
+    def test_load_json_backwards_compatible_format(self):
+        """Test loading JSON with path strings in multipass (backward compatibility)."""
+        test_data = {
+            "multipass": ["/path/to/shader1.fs", "/path/to/shader2.fs"],
+            "single_pass": ["/path/to/shader3.fs"],
+            "summary": {"total": 3},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            json_path = os.path.join(tmpdir, "test.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            paths = load_paths_from_json(json_path)
+            assert len(paths) == 3
+            assert "/path/to/shader1.fs" in paths
+            assert "/path/to/shader2.fs" in paths
+            assert "/path/to/shader3.fs" in paths
+
+
+class TestConvertWithJSON:
+    """Test convert command with JSON file input."""
+
+    def test_convert_json_file(self):
+        """Test converting ISF shaders from a JSON file."""
+        # Create a simple ISF shader
+        isf_shader = """/*
+{
+  "INPUTS": [],
+  "ISFVSN": "2"
+}
+*/
+void main() {
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+"""
+
+        test_data = {
+            "multipass": [],
+            "single_pass": [],
+            "summary": {"total": 1},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create an ISF file
+            isf_path = os.path.join(tmpdir, "test_shader.fs")
+            with open(isf_path, "w") as f:
+                f.write(isf_shader)
+
+            # Add it to JSON
+            test_data["single_pass"] = [isf_path]
+
+            # Create JSON file
+            json_path = os.path.join(tmpdir, "shaders.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            # Output directory
+            output_dir = os.path.join(tmpdir, "output")
+
+            # Test using main CLI
+            with patch("sys.argv", ["klproj", "convert", json_path, "-o", output_dir]):
+                result = main()
+
+            # Verify success
+            assert result == 0
+            output_file = os.path.join(output_dir, "test_shader.klproj")
+            assert os.path.exists(output_file)
+
+    def test_convert_mixed_json_and_direct_files(self):
+        """Test converting a mix of JSON file and direct ISF files."""
+        isf_shader1 = """/*
+{
+  "INPUTS": [],
+  "ISFVSN": "2"
+}
+*/
+void main() {
+    gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+}
+"""
+        isf_shader2 = """/*
+{
+  "INPUTS": [],
+  "ISFVSN": "2"
+}
+*/
+void main() {
+    gl_FragColor = vec4(0.0, 1.0, 0.0, 1.0);
+}
+"""
+
+        test_data = {
+            "multipass": [],
+            "single_pass": [],
+            "summary": {"total": 1},
+        }
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            # Create ISF files
+            isf1_path = os.path.join(tmpdir, "shader1.fs")
+            with open(isf1_path, "w") as f:
+                f.write(isf_shader1)
+
+            isf2_path = os.path.join(tmpdir, "shader2.fs")
+            with open(isf2_path, "w") as f:
+                f.write(isf_shader2)
+
+            # JSON with shader1
+            test_data["single_pass"] = [isf1_path]
+            json_path = os.path.join(tmpdir, "shaders.json")
+            with open(json_path, "w") as f:
+                json.dump(test_data, f)
+
+            # Output directory
+            output_dir = os.path.join(tmpdir, "output")
+
+            # Convert: JSON + direct ISF file
+            with patch("sys.argv", ["klproj", "convert", json_path, isf2_path, "-o", output_dir]):
+                result = main()
+
+            # Verify both were converted
+            assert result == 0
+            assert os.path.exists(os.path.join(output_dir, "shader1.klproj"))
+            assert os.path.exists(os.path.join(output_dir, "shader2.klproj"))
