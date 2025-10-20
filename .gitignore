@@ -49,3 +49,6 @@ docs/_build/
 # uv
 .python-version
 uv.lock
+
+# Tools
+actionlint

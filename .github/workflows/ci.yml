@@ -8,8 +8,6 @@ on:
       - 'docs/**'
       - 'tutorials/**'
       - 'extras/**'
-    paths:
-      - '.github/workflows/**'
   pull_request:
     branches: [ main, master ]
     paths-ignore:
@@ -17,8 +15,6 @@ on:
       - 'docs/**'
       - 'tutorials/**'
       - 'extras/**'
-    paths:
-      - '.github/workflows/**'
 
 permissions:
   contents: read
