@@ -104,11 +104,7 @@ class ConversionReporter:
                     print(f"  {Path(item).name}")
 
     def report_progress(
-        self,
-        current: int,
-        total: int,
-        filename: str,
-        file_info: Union[Path, ISFInfo, None] = None
+        self, current: int, total: int, filename: str, file_info: Union[Path, ISFInfo, None] = None
     ):
         """
         Report progress during batch conversion.
@@ -207,11 +203,11 @@ class ConversionReporter:
         if stats:
             print("\nOutput statistics:")
             print(f"  Directory: {stats.get('output_dir', 'N/A')}")
-            if 'total_size_mb' in stats:
+            if "total_size_mb" in stats:
                 print(f"  Total size: {stats['total_size_mb']:.2f} MB")
-            if 'api' in stats:
+            if "api" in stats:
                 print(f"  API: {stats['api']}")
-            if 'resolution' in stats:
+            if "resolution" in stats:
                 print(f"  Resolution: {stats['resolution']}")
 
     def print_info(self, message: str):

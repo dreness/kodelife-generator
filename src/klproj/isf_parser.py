@@ -26,6 +26,7 @@ class ISFInput:
 
     Supported types: event, bool, long, float, point2D, color, image, audio, audioFFT
     """
+
     name: str
     input_type: str
     label: Optional[str] = None
@@ -45,6 +46,7 @@ class ISFPass:
     Corresponds to entries in the PASSES array for multi-pass shaders.
     See: docs/ISF/isf-docs/pages/ref/ref_multipass.md
     """
+
     target: Optional[str] = None  # None means render to final output
     persistent: bool = False
     float_precision: bool = False
@@ -58,6 +60,7 @@ class ISFPass:
 @dataclass
 class ISFImported:
     """ISF imported image definition."""
+
     name: str
     path: str
 
@@ -65,6 +68,7 @@ class ISFImported:
 @dataclass
 class ISFShader:
     """Parsed ISF shader file."""
+
     isfvsn: str = "2"
     vsn: Optional[str] = None
     description: Optional[str] = None
@@ -106,7 +110,7 @@ def parse_isf_file(file_path: str) -> ISFShader:
     Raises:
         ValueError: If the file is not a valid ISF file
     """
-    with open(file_path, 'r', encoding='utf-8') as f:
+    with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
     return parse_isf_string(content)
@@ -126,7 +130,7 @@ def parse_isf_string(content: str) -> ISFShader:
         ValueError: If the content is not valid ISF
     """
     # Extract JSON metadata from comment block
-    json_match = re.match(r'/\*\s*(\{.*?\})\s*\*/', content, re.DOTALL)
+    json_match = re.match(r"/\*\s*(\{.*?\})\s*\*/", content, re.DOTALL)
     if not json_match:
         raise ValueError("No JSON metadata found in ISF file (must start with /* { ... } */)")
 
@@ -138,53 +142,53 @@ def parse_isf_string(content: str) -> ISFShader:
         raise ValueError(f"Invalid JSON metadata in ISF file: {e}") from e
 
     # Extract shader code (everything after the JSON comment)
-    shader_code = content[json_match.end():].strip()
+    shader_code = content[json_match.end() :].strip()
 
     # Parse metadata
     shader = ISFShader()
     shader.shader_code = shader_code
-    shader.isfvsn = metadata.get('ISFVSN', '2')
-    shader.vsn = metadata.get('VSN')
-    shader.description = metadata.get('DESCRIPTION')
-    shader.credit = metadata.get('CREDIT')
-    shader.categories = metadata.get('CATEGORIES', [])
+    shader.isfvsn = metadata.get("ISFVSN", "2")
+    shader.vsn = metadata.get("VSN")
+    shader.description = metadata.get("DESCRIPTION")
+    shader.credit = metadata.get("CREDIT")
+    shader.categories = metadata.get("CATEGORIES", [])
 
     # Parse inputs
-    for input_dict in metadata.get('INPUTS', []):
+    for input_dict in metadata.get("INPUTS", []):
         isf_input = ISFInput(
-            name=input_dict['NAME'],
-            input_type=input_dict['TYPE'],
-            label=input_dict.get('LABEL'),
-            default=input_dict.get('DEFAULT'),
-            min_val=input_dict.get('MIN'),
-            max_val=input_dict.get('MAX'),
-            identity=input_dict.get('IDENTITY'),
-            values=input_dict.get('VALUES'),
-            labels=input_dict.get('LABELS'),
+            name=input_dict["NAME"],
+            input_type=input_dict["TYPE"],
+            label=input_dict.get("LABEL"),
+            default=input_dict.get("DEFAULT"),
+            min_val=input_dict.get("MIN"),
+            max_val=input_dict.get("MAX"),
+            identity=input_dict.get("IDENTITY"),
+            values=input_dict.get("VALUES"),
+            labels=input_dict.get("LABELS"),
         )
         shader.inputs.append(isf_input)
 
     # Parse passes
-    for pass_dict in metadata.get('PASSES', []):
+    for pass_dict in metadata.get("PASSES", []):
         isf_pass = ISFPass(
-            target=pass_dict.get('TARGET'),  # Can be None for final output
-            persistent=bool(pass_dict.get('PERSISTENT', False)),
-            float_precision=bool(pass_dict.get('FLOAT', False)),
-            width=pass_dict.get('WIDTH'),
-            height=pass_dict.get('HEIGHT'),
-            description=pass_dict.get('DESCRIPTION'),
-            name=pass_dict.get('NAME'),
-            main=pass_dict.get('MAIN'),
+            target=pass_dict.get("TARGET"),  # Can be None for final output
+            persistent=bool(pass_dict.get("PERSISTENT", False)),
+            float_precision=bool(pass_dict.get("FLOAT", False)),
+            width=pass_dict.get("WIDTH"),
+            height=pass_dict.get("HEIGHT"),
+            description=pass_dict.get("DESCRIPTION"),
+            name=pass_dict.get("NAME"),
+            main=pass_dict.get("MAIN"),
         )
         shader.passes.append(isf_pass)
 
     # Parse imported images
-    imported_data = metadata.get('IMPORTED', {})
+    imported_data = metadata.get("IMPORTED", {})
     # IMPORTED can be either a dict or a list (usually empty list)
     if isinstance(imported_data, dict):
         for name, import_info in imported_data.items():
             if isinstance(import_info, dict):
-                path = import_info.get('PATH', '')
+                path = import_info.get("PATH", "")
             else:
                 path = str(import_info)
             shader.imported.append(ISFImported(name=name, path=path))

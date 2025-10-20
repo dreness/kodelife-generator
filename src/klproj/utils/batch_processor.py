@@ -50,28 +50,22 @@ class ConversionResult:
             output_path: Path to output JSON file
         """
         data = {
-            'successful': [str(p) for p in self.successful],
-            'failed': [
-                {'file': str(path), 'error': error}
-                for path, error in self.failed
-            ],
-            'skipped': [
-                {'file': str(path), 'reason': reason}
-                for path, reason in self.skipped
-            ],
-            'summary': {
-                'total_processed': self.total_processed,
-                'successful': self.success_count,
-                'failed': self.error_count,
-                'skipped': self.skip_count,
-                'success_rate': f"{(self.success_count / max(1, self.total_processed)) * 100:.1f}%"
-            }
+            "successful": [str(p) for p in self.successful],
+            "failed": [{"file": str(path), "error": error} for path, error in self.failed],
+            "skipped": [{"file": str(path), "reason": reason} for path, reason in self.skipped],
+            "summary": {
+                "total_processed": self.total_processed,
+                "successful": self.success_count,
+                "failed": self.error_count,
+                "skipped": self.skip_count,
+                "success_rate": f"{(self.success_count / max(1, self.total_processed)) * 100:.1f}%",
+            },
         }
 
         output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
 
-        with open(output_file, 'w') as f:
+        with open(output_file, "w") as f:
             json.dump(data, f, indent=2)
 
 
@@ -86,10 +80,10 @@ class BatchConverter:
     def __init__(
         self,
         output_dir: str,
-        api: str = 'GL3',
+        api: str = "GL3",
         width: int = 1920,
         height: int = 1080,
-        overwrite: bool = False
+        overwrite: bool = False,
     ):
         """
         Initialize batch converter.
@@ -120,7 +114,7 @@ class BatchConverter:
         Returns:
             Sanitized filename with only alphanumeric, dash, and underscore characters
         """
-        return "".join(c if c.isalnum() or c in ('-', '_') else '_' for c in filename)
+        return "".join(c if c.isalnum() or c in ("-", "_") else "_" for c in filename)
 
     def _get_output_path(self, input_path: Path) -> Path:
         """
@@ -137,9 +131,7 @@ class BatchConverter:
         return self.output_dir / f"{safe_name}.klproj"
 
     def convert_file(
-        self,
-        input_file: Union[Path, ISFInfo],
-        reporter: Optional[Callable] = None
+        self, input_file: Union[Path, ISFInfo], reporter: Optional[Callable] = None
     ) -> tuple[bool, Optional[Path], Optional[str]]:
         """
         Convert a single ISF file.
@@ -175,7 +167,7 @@ class BatchConverter:
                 output_path=str(output_path),
                 api=self.api,
                 width=self.width,
-                height=self.height
+                height=self.height,
             )
 
             return True, Path(result_path), None
@@ -187,7 +179,7 @@ class BatchConverter:
         self,
         files: List[Union[Path, ISFInfo]],
         reporter: Optional[Callable] = None,
-        continue_on_error: bool = True
+        continue_on_error: bool = True,
     ) -> ConversionResult:
         """
         Convert a batch of ISF files.
@@ -234,15 +226,15 @@ class BatchConverter:
         Returns:
             Dictionary with statistics about converted files
         """
-        klproj_files = list(self.output_dir.glob('*.klproj'))
+        klproj_files = list(self.output_dir.glob("*.klproj"))
 
         total_size = sum(f.stat().st_size for f in klproj_files)
 
         return {
-            'output_dir': str(self.output_dir),
-            'file_count': len(klproj_files),
-            'total_size_bytes': total_size,
-            'total_size_mb': total_size / (1024 * 1024),
-            'api': self.api,
-            'resolution': f"{self.width}x{self.height}"
+            "output_dir": str(self.output_dir),
+            "file_count": len(klproj_files),
+            "total_size_bytes": total_size,
+            "total_size_mb": total_size / (1024 * 1024),
+            "api": self.api,
+            "resolution": f"{self.width}x{self.height}",
         }

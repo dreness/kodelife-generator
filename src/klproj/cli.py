@@ -64,7 +64,7 @@ def convert_isf(
     output_dir: str = None,
     width: int = 1920,
     height: int = 1080,
-    api: str = "GL3"
+    api: str = "GL3",
 ) -> int:
     """
     Convert ISF file(s) to .klproj format.
@@ -98,7 +98,7 @@ def convert_isf(
                 output_path=output_path,
                 api=api,
                 width=width,
-                height=height
+                height=height,
             )
 
             print(f"✓ Converted: {input_file} -> {result_path}")
@@ -137,26 +137,16 @@ def main():
     convert_parser = subparsers.add_parser("convert", help="Convert ISF file(s) to .klproj format")
     convert_parser.add_argument("inputs", nargs="+", help="Input ISF file(s)")
     convert_parser.add_argument(
-        "-o", "--output-dir",
-        help="Output directory (default: same as input file)"
+        "-o", "--output-dir", help="Output directory (default: same as input file)"
     )
     convert_parser.add_argument(
-        "-w", "--width",
-        type=int,
-        default=1920,
-        help="Project width in pixels (default: 1920)"
+        "-w", "--width", type=int, default=1920, help="Project width in pixels (default: 1920)"
     )
     convert_parser.add_argument(
-        "--height",
-        type=int,
-        default=1080,
-        help="Project height in pixels (default: 1080)"
+        "--height", type=int, default=1080, help="Project height in pixels (default: 1080)"
     )
     convert_parser.add_argument(
-        "-a", "--api",
-        choices=["GL2", "GL3"],
-        default="GL3",
-        help="Graphics API (default: GL3)"
+        "-a", "--api", choices=["GL2", "GL3"], default="GL3", help="Graphics API (default: GL3)"
     )
 
     args = parser.parse_args()
@@ -171,7 +161,7 @@ def main():
             output_dir=args.output_dir,
             width=args.width,
             height=args.height,
-            api=args.api
+            api=args.api,
         )
     else:
         parser.print_help()

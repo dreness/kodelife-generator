@@ -36,15 +36,15 @@ from .types import (
 # ISF to KodeLife parameter type mapping
 # ISF input types: docs/ISF/isf-docs/pages/ref/ref_json.md (TYPE values)
 ISF_TO_KODELIFE_PARAM_TYPE = {
-    'event': ParamType.CONSTANT_FLOAT1,  # Momentary button
-    'bool': ParamType.CONSTANT_FLOAT1,   # Boolean (0.0 or 1.0)
-    'long': ParamType.CONSTANT_FLOAT1,   # Integer/enum selector
-    'float': ParamType.CONSTANT_FLOAT1,  # Floating point value
-    'point2D': ParamType.CONSTANT_FLOAT2,  # 2D coordinate
-    'color': ParamType.CONSTANT_FLOAT4,  # RGBA color
-    'image': ParamType.CONSTANT_TEXTURE_2D,  # Texture input
-    'audio': ParamType.CONSTANT_TEXTURE_2D,  # Audio waveform as texture
-    'audioFFT': ParamType.CONSTANT_TEXTURE_2D,  # Audio FFT as texture
+    "event": ParamType.CONSTANT_FLOAT1,  # Momentary button
+    "bool": ParamType.CONSTANT_FLOAT1,  # Boolean (0.0 or 1.0)
+    "long": ParamType.CONSTANT_FLOAT1,  # Integer/enum selector
+    "float": ParamType.CONSTANT_FLOAT1,  # Floating point value
+    "point2D": ParamType.CONSTANT_FLOAT2,  # 2D coordinate
+    "color": ParamType.CONSTANT_FLOAT4,  # RGBA color
+    "image": ParamType.CONSTANT_TEXTURE_2D,  # Texture input
+    "audio": ParamType.CONSTANT_TEXTURE_2D,  # Audio waveform as texture
+    "audioFFT": ParamType.CONSTANT_TEXTURE_2D,  # Audio FFT as texture
 }
 
 
@@ -66,63 +66,60 @@ def convert_isf_input_to_parameter(isf_input: ISFInput) -> Optional[Parameter]:
 
     # Set default value
     if isf_input.default is not None:
-        if isf_input.input_type in ('bool', 'event'):
-            properties['value'] = 1.0 if isf_input.default else 0.0
-        elif isf_input.input_type in ('float', 'long'):
-            properties['value'] = float(isf_input.default)
-        elif isf_input.input_type == 'point2D':
+        if isf_input.input_type in ("bool", "event"):
+            properties["value"] = 1.0 if isf_input.default else 0.0
+        elif isf_input.input_type in ("float", "long"):
+            properties["value"] = float(isf_input.default)
+        elif isf_input.input_type == "point2D":
             if isinstance(isf_input.default, list) and len(isf_input.default) >= 2:
-                properties['value'] = Vec2(
-                    float(isf_input.default[0]),
-                    float(isf_input.default[1])
-                )
+                properties["value"] = Vec2(float(isf_input.default[0]), float(isf_input.default[1]))
             else:
-                properties['value'] = Vec2(0.0, 0.0)
-        elif isf_input.input_type == 'color':
+                properties["value"] = Vec2(0.0, 0.0)
+        elif isf_input.input_type == "color":
             if isinstance(isf_input.default, list):
                 vals = [float(v) for v in isf_input.default]
                 # Pad to 4 components if needed
                 while len(vals) < 4:
                     vals.append(1.0 if len(vals) == 3 else 0.0)
-                properties['value'] = Vec4(*vals[:4])
+                properties["value"] = Vec4(*vals[:4])
             else:
-                properties['value'] = Vec4(1.0, 1.0, 1.0, 1.0)
+                properties["value"] = Vec4(1.0, 1.0, 1.0, 1.0)
 
     # Set min/max range for numeric types
-    if isf_input.input_type in ('float', 'long', 'bool', 'event'):
+    if isf_input.input_type in ("float", "long", "bool", "event"):
         if isf_input.min_val is not None:
-            properties['min'] = float(isf_input.min_val)
-        elif isf_input.input_type in ('bool', 'event'):
-            properties['min'] = 0.0  # Boolean range is 0-1
+            properties["min"] = float(isf_input.min_val)
+        elif isf_input.input_type in ("bool", "event"):
+            properties["min"] = 0.0  # Boolean range is 0-1
         if isf_input.max_val is not None:
-            properties['max'] = float(isf_input.max_val)
-        elif isf_input.input_type in ('bool', 'event'):
-            properties['max'] = 1.0  # Boolean range is 0-1
+            properties["max"] = float(isf_input.max_val)
+        elif isf_input.input_type in ("bool", "event"):
+            properties["max"] = 1.0  # Boolean range is 0-1
         # Set default value for event type if not specified
-        if isf_input.input_type == 'event' and 'value' not in properties:
-            properties['value'] = 0.0  # Events default to off
-    elif isf_input.input_type == 'point2D':
+        if isf_input.input_type == "event" and "value" not in properties:
+            properties["value"] = 0.0  # Events default to off
+    elif isf_input.input_type == "point2D":
         if isf_input.min_val is not None and isinstance(isf_input.min_val, list):
-            properties['min'] = Vec2(
+            properties["min"] = Vec2(
                 float(isf_input.min_val[0]) if len(isf_input.min_val) > 0 else 0.0,
-                float(isf_input.min_val[1]) if len(isf_input.min_val) > 1 else 0.0
+                float(isf_input.min_val[1]) if len(isf_input.min_val) > 1 else 0.0,
             )
         if isf_input.max_val is not None and isinstance(isf_input.max_val, list):
-            properties['max'] = Vec2(
+            properties["max"] = Vec2(
                 float(isf_input.max_val[0]) if len(isf_input.max_val) > 0 else 1.0,
-                float(isf_input.max_val[1]) if len(isf_input.max_val) > 1 else 1.0
+                float(isf_input.max_val[1]) if len(isf_input.max_val) > 1 else 1.0,
             )
-    elif isf_input.input_type == 'color':
+    elif isf_input.input_type == "color":
         if isf_input.min_val is not None and isinstance(isf_input.min_val, list):
             vals = [float(v) for v in isf_input.min_val]
             while len(vals) < 4:
                 vals.append(0.0)
-            properties['min'] = Vec4(*vals[:4])
+            properties["min"] = Vec4(*vals[:4])
         if isf_input.max_val is not None and isinstance(isf_input.max_val, list):
             vals = [float(v) for v in isf_input.max_val]
             while len(vals) < 4:
                 vals.append(1.0)
-            properties['max'] = Vec4(*vals[:4])
+            properties["max"] = Vec4(*vals[:4])
 
     # Create parameter
     display_name = isf_input.label if isf_input.label else isf_input.name
@@ -131,7 +128,7 @@ def convert_isf_input_to_parameter(isf_input: ISFInput) -> Optional[Parameter]:
         display_name=display_name,
         variable_name=isf_input.name,
         ui_expanded=0,
-        properties=properties
+        properties=properties,
     )
 
 
@@ -147,35 +144,40 @@ def generate_uniform_declarations(parameters: List[Parameter]) -> str:
     """
     # Map parameter types to GLSL types
     param_type_to_glsl = {
-        ParamType.CLOCK: 'float',
-        ParamType.FRAME_DELTA: 'float',
-        ParamType.FRAME_NUMBER: 'float',
-        ParamType.AUDIO_SAMPLE_RATE: 'float',
-        ParamType.FRAME_RESOLUTION: 'vec2',
-        ParamType.INPUT_MOUSE_SIMPLE: 'vec4',
-        ParamType.DATE: 'vec4',
-        ParamType.CONSTANT_FLOAT1: 'float',
-        ParamType.CONSTANT_FLOAT2: 'vec2',
-        ParamType.CONSTANT_FLOAT3: 'vec3',
-        ParamType.CONSTANT_FLOAT4: 'vec4',
-        ParamType.CONSTANT_TEXTURE_2D: 'sampler2D',
-        ParamType.FRAME_PREV_FRAME: 'sampler2D',
-        ParamType.FRAME_PREV_PASS: 'sampler2D',
-        ParamType.AUDIO_SPECTRUM_FULL: 'sampler2D',
-        ParamType.AUDIO_SPECTRUM_SPLIT: 'sampler2D',
-        ParamType.TRANSFORM_MVP: 'mat4',
+        ParamType.CLOCK: "float",
+        ParamType.FRAME_DELTA: "float",
+        ParamType.FRAME_NUMBER: "float",
+        ParamType.AUDIO_SAMPLE_RATE: "float",
+        ParamType.FRAME_RESOLUTION: "vec2",
+        ParamType.INPUT_MOUSE_SIMPLE: "vec4",
+        ParamType.DATE: "vec4",
+        ParamType.CONSTANT_FLOAT1: "float",
+        ParamType.CONSTANT_FLOAT2: "vec2",
+        ParamType.CONSTANT_FLOAT3: "vec3",
+        ParamType.CONSTANT_FLOAT4: "vec4",
+        ParamType.CONSTANT_TEXTURE_2D: "sampler2D",
+        ParamType.FRAME_PREV_FRAME: "sampler2D",
+        ParamType.FRAME_PREV_PASS: "sampler2D",
+        ParamType.AUDIO_SPECTRUM_FULL: "sampler2D",
+        ParamType.AUDIO_SPECTRUM_SPLIT: "sampler2D",
+        ParamType.TRANSFORM_MVP: "mat4",
     }
 
     declarations = []
     for param in parameters:
         glsl_type = param_type_to_glsl.get(param.param_type)
         if glsl_type:
-            declarations.append(f'uniform {glsl_type} {param.variable_name};')
+            declarations.append(f"uniform {glsl_type} {param.variable_name};")
 
-    return '\n'.join(declarations)
+    return "\n".join(declarations)
 
 
-def adapt_isf_shader_code(shader_code: str, isf_shader: ISFShader, parameters: List[Parameter], pass_index: Optional[int] = None) -> str:
+def adapt_isf_shader_code(
+    shader_code: str,
+    isf_shader: ISFShader,
+    parameters: List[Parameter],
+    pass_index: Optional[int] = None,
+) -> str:
     """
     Adapt ISF shader code for KodeLife (GL3 profile).
 
@@ -213,63 +215,68 @@ def adapt_isf_shader_code(shader_code: str, isf_shader: ISFShader, parameters: L
     #   in vec2 texOffsets[5];
     #   #endif
     # This is a simplification - we just remove these entirely since they're rarely initialized correctly
-    code = re.sub(r'#if\s+__VERSION__\s*<=\s*120\s*\n\s*varying\s+[^\n]+\n\s*#else\s*\n\s*in\s+[^\n]+\n\s*#endif', '', code)
+    code = re.sub(
+        r"#if\s+__VERSION__\s*<=\s*120\s*\n\s*varying\s+[^\n]+\n\s*#else\s*\n\s*in\s+[^\n]+\n\s*#endif",
+        "",
+        code,
+    )
 
     # Remove standalone varying declarations (deprecated in GL3)
-    code = re.sub(r'\bvarying\s+', '// varying ', code)  # Comment out varying keyword
+    code = re.sub(r"\bvarying\s+", "// varying ", code)  # Comment out varying keyword
 
     # Replace ISF built-in variables
     # isf_FragNormCoord -> gl_FragCoord.xy / RENDERSIZE
-    code = re.sub(r'\bisf_FragNormCoord\b', '(gl_FragCoord.xy / RENDERSIZE)', code)
+    code = re.sub(r"\bisf_FragNormCoord\b", "(gl_FragCoord.xy / RENDERSIZE)", code)
 
     # Replace ISF texture sampling macros
     # IMG_THIS_PIXEL(image) -> texture(image, gl_FragCoord.xy / RENDERSIZE)
     # This must come before IMG_NORM_PIXEL to avoid partial matches
-    code = re.sub(r'\bIMG_THIS_PIXEL\s*\(\s*(\w+)\s*\)',
-                  r'texture(\1, gl_FragCoord.xy / RENDERSIZE)', code)
+    code = re.sub(
+        r"\bIMG_THIS_PIXEL\s*\(\s*(\w+)\s*\)", r"texture(\1, gl_FragCoord.xy / RENDERSIZE)", code
+    )
 
     # IMG_NORM_THIS_PIXEL(image) -> texture(image, gl_FragCoord.xy / RENDERSIZE)
     # Equivalent to IMG_THIS_PIXEL in practice
-    code = re.sub(r'\bIMG_NORM_THIS_PIXEL\s*\(\s*(\w+)\s*\)',
-                  r'texture(\1, gl_FragCoord.xy / RENDERSIZE)', code)
+    code = re.sub(
+        r"\bIMG_NORM_THIS_PIXEL\s*\(\s*(\w+)\s*\)",
+        r"texture(\1, gl_FragCoord.xy / RENDERSIZE)",
+        code,
+    )
 
     # IMG_NORM_PIXEL(image, coord) -> texture(image, coord)
-    code = re.sub(r'\bIMG_NORM_PIXEL\s*\(\s*(\w+)\s*,\s*([^)]+)\)',
-                  r'texture(\1, \2)', code)
+    code = re.sub(r"\bIMG_NORM_PIXEL\s*\(\s*(\w+)\s*,\s*([^)]+)\)", r"texture(\1, \2)", code)
 
     # IMG_PIXEL(image, coord) -> texture(image, coord / vec2(textureSize(image, 0)))
     # Note: This regex captures the image name to use it in textureSize
     def replace_img_pixel(match):
         image_name = match.group(1)
         coord = match.group(2)
-        return f'texture({image_name}, ({coord}) / vec2(textureSize({image_name}, 0)))'
+        return f"texture({image_name}, ({coord}) / vec2(textureSize({image_name}, 0)))"
 
-    code = re.sub(r'\bIMG_PIXEL\s*\(\s*(\w+)\s*,\s*([^)]+)\)',
-                  replace_img_pixel, code)
+    code = re.sub(r"\bIMG_PIXEL\s*\(\s*(\w+)\s*,\s*([^)]+)\)", replace_img_pixel, code)
 
     # IMG_SIZE(image) -> vec2(textureSize(image, 0))
-    code = re.sub(r'\bIMG_SIZE\s*\(\s*(\w+)\s*\)',
-                  r'vec2(textureSize(\1, 0))', code)
+    code = re.sub(r"\bIMG_SIZE\s*\(\s*(\w+)\s*\)", r"vec2(textureSize(\1, 0))", code)
 
     # Handle boolean comparisons (ISF bools are converted to floats)
     # Remove '== true' comparisons (float != 0.0 is implicitly true)
-    code = re.sub(r'\s*==\s*true\b', ' != 0.0', code)
+    code = re.sub(r"\s*==\s*true\b", " != 0.0", code)
     # Replace '== false' with '== 0.0'
-    code = re.sub(r'\s*==\s*false\b', ' == 0.0', code)
+    code = re.sub(r"\s*==\s*false\b", " == 0.0", code)
     # Replace '!= true' with '== 0.0'
-    code = re.sub(r'\s*!=\s*true\b', ' == 0.0', code)
+    code = re.sub(r"\s*!=\s*true\b", " == 0.0", code)
     # Replace '!= false' with '!= 0.0'
-    code = re.sub(r'\s*!=\s*false\b', ' != 0.0', code)
+    code = re.sub(r"\s*!=\s*false\b", " != 0.0", code)
 
     # Add #version directive if not present
-    if '#version' not in code:
-        code = '#version 150\n' + code
+    if "#version" not in code:
+        code = "#version 150\n" + code
 
     # Find where to insert uniform declarations and output variable
-    lines = code.split('\n')
+    lines = code.split("\n")
     version_idx = 0
     for i, line in enumerate(lines):
-        if line.strip().startswith('#version'):
+        if line.strip().startswith("#version"):
             version_idx = i + 1
             break
 
@@ -277,7 +284,7 @@ def adapt_isf_shader_code(shader_code: str, isf_shader: ISFShader, parameters: L
     uniform_decls = generate_uniform_declarations(parameters)
 
     # Ensure we have an out variable for fragment color
-    has_out_var = any('out vec4' in line for line in lines)
+    has_out_var = any("out vec4" in line for line in lines)
 
     # Build the header section to insert
     header_lines = []
@@ -286,18 +293,18 @@ def adapt_isf_shader_code(shader_code: str, isf_shader: ISFShader, parameters: L
 
     # Add PASSINDEX constant for multi-pass shaders
     if pass_index is not None:
-        header_lines.append(f'const int PASSINDEX = {pass_index};')
+        header_lines.append(f"const int PASSINDEX = {pass_index};")
 
     if not has_out_var:
-        header_lines.append('out vec4 fragColor;')
+        header_lines.append("out vec4 fragColor;")
 
     # Insert header after #version
     if header_lines:
-        lines.insert(version_idx, '\n'.join(header_lines))
-        code = '\n'.join(lines)
+        lines.insert(version_idx, "\n".join(header_lines))
+        code = "\n".join(lines)
 
     # Replace gl_FragColor with fragColor if present
-    code = code.replace('gl_FragColor', 'fragColor')
+    code = code.replace("gl_FragColor", "fragColor")
 
     return code
 
@@ -337,17 +344,11 @@ def evaluate_pass_dimension(expression, width: int, height: int) -> int:
     expr = str(expression)
 
     # Replace $WIDTH and $HEIGHT with actual values
-    expr = expr.replace('$WIDTH', str(width))
-    expr = expr.replace('$HEIGHT', str(height))
+    expr = expr.replace("$WIDTH", str(width))
+    expr = expr.replace("$HEIGHT", str(height))
 
     # Create safe evaluation context with math functions
-    safe_dict = {
-        'floor': math.floor,
-        'ceil': math.ceil,
-        'max': max,
-        'min': min,
-        '__builtins__': {}
-    }
+    safe_dict = {"floor": math.floor, "ceil": math.ceil, "max": max, "min": min, "__builtins__": {}}
 
     try:
         result = eval(expr, safe_dict)
@@ -357,7 +358,9 @@ def evaluate_pass_dimension(expression, width: int, height: int) -> int:
         return None
 
 
-def adapt_isf_vertex_shader_code(vertex_code: str, parameters: List[Parameter], api: str = "GL3") -> str:
+def adapt_isf_vertex_shader_code(
+    vertex_code: str, parameters: List[Parameter], api: str = "GL3"
+) -> str:
     """
     Adapt ISF vertex shader code for KodeLife.
 
@@ -399,43 +402,39 @@ def adapt_isf_vertex_shader_code(vertex_code: str, parameters: List[Parameter], 
 
         # Match: #if __VERSION__ <= 120\nvarying ...\n#else\nout ...\n#endif
         code = re.sub(
-            r'#if\s+__VERSION__\s*<=\s*120\s*\n(.*?)\n\s*#else\s*\n(.*?)\n\s*#endif',
+            r"#if\s+__VERSION__\s*<=\s*120\s*\n(.*?)\n\s*#else\s*\n(.*?)\n\s*#endif",
             replace_conditional_varying,
             code,
-            flags=re.DOTALL
+            flags=re.DOTALL,
         )
 
     # Remove standalone varying keyword (deprecated in GL3)
-    code = re.sub(r'\bvarying\s+', 'out ', code)
+    code = re.sub(r"\bvarying\s+", "out ", code)
 
     # Remove isf_vertShaderInit() calls - we'll handle vertex initialization ourselves
-    code = re.sub(r'\bisf_vertShaderInit\s*\(\s*\)\s*;', '', code)
+    code = re.sub(r"\bisf_vertShaderInit\s*\(\s*\)\s*;", "", code)
 
     # Replace isf_FragNormCoord with a computed value
     # In vertex shaders, this represents the normalized vertex position
     # We need to add vertex attributes and compute it
-    if 'isf_FragNormCoord' in code:
+    if "isf_FragNormCoord" in code:
         # We'll need to add vertex attributes for texture coordinates
         # For now, compute it from the vertex position
         # Assuming the default KodeLife quad goes from -1 to 1, we convert to 0-1
-        code = re.sub(
-            r'\bisf_FragNormCoord\b',
-            '((a_position.xy + 1.0) * 0.5)',
-            code
-        )
+        code = re.sub(r"\bisf_FragNormCoord\b", "((a_position.xy + 1.0) * 0.5)", code)
 
     # Add #version directive if not present
-    if '#version' not in code:
+    if "#version" not in code:
         if api == "GL3":
-            code = '#version 150\n' + code
+            code = "#version 150\n" + code
         else:
-            code = '#version 120\n' + code
+            code = "#version 120\n" + code
 
     # Find where to insert uniform declarations and attributes
-    lines = code.split('\n')
+    lines = code.split("\n")
     version_idx = 0
     for i, line in enumerate(lines):
-        if line.strip().startswith('#version'):
+        if line.strip().startswith("#version"):
             version_idx = i + 1
             break
 
@@ -443,24 +442,24 @@ def adapt_isf_vertex_shader_code(vertex_code: str, parameters: List[Parameter], 
     uniform_decls = generate_uniform_declarations(parameters)
 
     # Add necessary vertex attributes if not present
-    has_position_attr = any('a_position' in line for line in lines)
-    has_mvp_uniform = any('mvp' in line and 'uniform' in line for line in lines)
+    has_position_attr = any("a_position" in line for line in lines)
+    has_mvp_uniform = any("mvp" in line and "uniform" in line for line in lines)
 
     # Check if we need gl_Position calculation
-    has_gl_position = any('gl_Position' in line for line in lines)
+    has_gl_position = any("gl_Position" in line for line in lines)
 
     # Build the header section to insert
     header_lines = []
 
     # Add vertex attribute declaration for GL3
     if not has_position_attr and api == "GL3":
-        header_lines.append('in vec4 a_position;')
+        header_lines.append("in vec4 a_position;")
     elif not has_position_attr and api == "GL2":
-        header_lines.append('attribute vec4 a_position;')
+        header_lines.append("attribute vec4 a_position;")
 
     # Add MVP uniform if not present
     if not has_mvp_uniform:
-        header_lines.append('uniform mat4 mvp;')
+        header_lines.append("uniform mat4 mvp;")
 
     # Add other uniform declarations
     if uniform_decls:
@@ -468,24 +467,24 @@ def adapt_isf_vertex_shader_code(vertex_code: str, parameters: List[Parameter], 
 
     # Insert header after #version
     if header_lines:
-        lines.insert(version_idx, '\n'.join(header_lines))
+        lines.insert(version_idx, "\n".join(header_lines))
 
     # If the vertex shader doesn't set gl_Position, add it
     if not has_gl_position:
         # Find the main function and add gl_Position as the first line
         for i, line in enumerate(lines):
-            if 'void main()' in line or 'void main (' in line:
+            if "void main()" in line or "void main (" in line:
                 # Find the opening brace
                 brace_idx = i
                 for j in range(i, len(lines)):
-                    if '{' in lines[j]:
+                    if "{" in lines[j]:
                         brace_idx = j
                         break
                 # Insert gl_Position calculation after the opening brace
-                lines.insert(brace_idx + 1, '    gl_Position = mvp * a_position;')
+                lines.insert(brace_idx + 1, "    gl_Position = mvp * a_position;")
                 break
 
-    code = '\n'.join(lines)
+    code = "\n".join(lines)
 
     return code
 
@@ -533,12 +532,12 @@ def load_custom_vertex_shader(isf_file_path: str, api: str = "GL3") -> Optional[
     """
     # Get the base filename without extension
     base_path = os.path.splitext(isf_file_path)[0]
-    vs_path = base_path + '.vs'
+    vs_path = base_path + ".vs"
 
     # Check if .vs file exists
     if os.path.exists(vs_path):
         try:
-            with open(vs_path, 'r', encoding='utf-8') as f:
+            with open(vs_path, "r", encoding="utf-8") as f:
                 vs_code = f.read()
             print(f"Using custom vertex shader: {os.path.basename(vs_path)}")
             return vs_code
@@ -554,7 +553,7 @@ def convert_isf_to_kodelife(
     output_path: Optional[str] = None,
     api: str = "GL3",
     width: int = 1920,
-    height: int = 1080
+    height: int = 1080,
 ) -> str:
     """
     Convert an ISF file to a KodeLife project.
@@ -602,7 +601,7 @@ def convert_isf_to_kodelife(
         display_name="Time",
         variable_name="TIME",
         ui_expanded=1,
-        properties={'running': 1, 'speed': 1.0, 'direction': 1}
+        properties={"running": 1, "speed": 1.0, "direction": 1},
     )
     builder.add_global_param(time_param)
 
@@ -611,16 +610,13 @@ def convert_isf_to_kodelife(
         param_type=ParamType.FRAME_RESOLUTION,
         display_name="Render Size",
         variable_name="RENDERSIZE",
-        ui_expanded=1
+        ui_expanded=1,
     )
     builder.add_global_param(resolution_param)
 
     # DATE uniform
     date_param = Parameter(
-        param_type=ParamType.DATE,
-        display_name="Date",
-        variable_name="DATE",
-        ui_expanded=0
+        param_type=ParamType.DATE, display_name="Date", variable_name="DATE", ui_expanded=0
     )
     builder.add_global_param(date_param)
 
@@ -629,7 +625,7 @@ def convert_isf_to_kodelife(
         param_type=ParamType.FRAME_DELTA,
         display_name="Time Delta",
         variable_name="TIMEDELTA",
-        ui_expanded=0
+        ui_expanded=0,
     )
     builder.add_global_param(delta_param)
 
@@ -638,7 +634,7 @@ def convert_isf_to_kodelife(
         param_type=ParamType.FRAME_NUMBER,
         display_name="Frame Index",
         variable_name="FRAMEINDEX",
-        ui_expanded=0
+        ui_expanded=0,
     )
     builder.add_global_param(frame_param)
 
@@ -651,7 +647,13 @@ def convert_isf_to_kodelife(
             isf_params.append(param)
 
     # Collect all global parameters for uniform generation
-    all_global_params = [time_param, resolution_param, date_param, delta_param, frame_param] + isf_params
+    all_global_params = [
+        time_param,
+        resolution_param,
+        date_param,
+        delta_param,
+        frame_param,
+    ] + isf_params
 
     # Create buffer parameters for multipass rendering
     buffer_params = {}  # Maps buffer name -> Parameter
@@ -663,10 +665,14 @@ def convert_isf_to_kodelife(
                 # Create a texture parameter for this buffer
                 # Use FRAME_PREV_PASS for persistent buffers to get feedback from previous frame
                 buffer_param = Parameter(
-                    param_type=ParamType.FRAME_PREV_PASS if isf_pass.persistent else ParamType.CONSTANT_TEXTURE_2D,
+                    param_type=(
+                        ParamType.FRAME_PREV_PASS
+                        if isf_pass.persistent
+                        else ParamType.CONSTANT_TEXTURE_2D
+                    ),
                     display_name=isf_pass.target,
                     variable_name=isf_pass.target,
-                    ui_expanded=0
+                    ui_expanded=0,
                 )
                 buffer_params[isf_pass.target] = buffer_param
 
@@ -721,17 +727,19 @@ def convert_isf_to_kodelife(
                 enabled=1,
                 hidden=1,
                 sources=[ShaderSource(vertex_profile, vertex_code)],
-                parameters=[create_mvp_param()]
+                parameters=[create_mvp_param()],
             )
 
             # Create fragment shader with uniform declarations
             # Pass the pass_index so PASSINDEX is defined correctly for multi-pass shaders
-            fragment_code = adapt_isf_shader_code(isf_shader.shader_code, isf_shader, pass_params, pass_index=pass_idx)
+            fragment_code = adapt_isf_shader_code(
+                isf_shader.shader_code, isf_shader, pass_params, pass_index=pass_idx
+            )
             fragment_stage = ShaderStage(
                 stage_type=ShaderStageType.FRAGMENT,
                 enabled=1,
                 hidden=0,
-                sources=[ShaderSource(vertex_profile, fragment_code)]
+                sources=[ShaderSource(vertex_profile, fragment_code)],
             )
 
             # Determine pass label
@@ -747,7 +755,7 @@ def convert_isf_to_kodelife(
                 primitive_type="TRIANGLES",
                 stages=[vertex_stage, fragment_stage],
                 width=pass_width,
-                height=pass_height
+                height=pass_height,
             )
 
             builder.add_pass(render_pass)
@@ -765,7 +773,7 @@ def convert_isf_to_kodelife(
             enabled=1,
             hidden=1,
             sources=[ShaderSource(vertex_profile, vertex_code)],
-            parameters=[create_mvp_param()]
+            parameters=[create_mvp_param()],
         )
 
         # Create fragment shader with uniform declarations
@@ -774,7 +782,7 @@ def convert_isf_to_kodelife(
             stage_type=ShaderStageType.FRAGMENT,
             enabled=1,
             hidden=0,
-            sources=[ShaderSource(vertex_profile, fragment_code)]
+            sources=[ShaderSource(vertex_profile, fragment_code)],
         )
 
         # Determine label based on ISF type
@@ -796,7 +804,7 @@ def convert_isf_to_kodelife(
             primitive_type="TRIANGLES",
             stages=[vertex_stage, fragment_stage],
             width=width,
-            height=height
+            height=height,
         )
 
         builder.add_pass(render_pass)

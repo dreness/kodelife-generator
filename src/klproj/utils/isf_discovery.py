@@ -51,7 +51,7 @@ class ISFDiscovery:
             base_dirs: List of directories to search. If None, uses default locations.
         """
         if base_dirs is None:
-            base_dirs = ['/Users/andre/Library/Graphics/ISF']
+            base_dirs = ["/Users/andre/Library/Graphics/ISF"]
 
         self.base_dirs = [Path(d) for d in base_dirs]
         self._multipass_cache: Optional[List[ISFInfo]] = None
@@ -67,7 +67,7 @@ class ISFDiscovery:
         Returns:
             Parsed JSON metadata or None if not found/invalid
         """
-        match = re.match(r'/\*\s*(\{.*?\})\s*\*/', shader_text, re.DOTALL)
+        match = re.match(r"/\*\s*(\{.*?\})\s*\*/", shader_text, re.DOTALL)
         if match:
             try:
                 return json.loads(match.group(1))
@@ -86,7 +86,7 @@ class ISFDiscovery:
             Tuple of (multipass_shaders, single_pass_shaders)
         """
         if extensions is None:
-            extensions = ['.fs', '.frag', '.glsl']
+            extensions = [".fs", ".frag", ".glsl"]
 
         multipass = []
         single_pass = []
@@ -97,10 +97,10 @@ class ISFDiscovery:
 
             # Find all ISF files
             for ext in extensions:
-                pattern = f'*{ext}'
+                pattern = f"*{ext}"
                 for file_path in base_dir.rglob(pattern):
                     try:
-                        with open(file_path, 'r', encoding='utf-8') as f:
+                        with open(file_path, "r", encoding="utf-8") as f:
                             content = f.read()
 
                         metadata = self._extract_isf_metadata(content)
@@ -110,15 +110,15 @@ class ISFDiscovery:
                             continue
 
                         # Check for PASSES (multipass shader)
-                        is_multipass = 'PASSES' in metadata
+                        is_multipass = "PASSES" in metadata
 
                         isf_info = ISFInfo(
                             path=file_path,
                             is_multipass=is_multipass,
-                            passes=metadata.get('PASSES', []),
-                            description=metadata.get('DESCRIPTION', ''),
-                            categories=metadata.get('CATEGORIES', []),
-                            inputs=metadata.get('INPUTS', [])
+                            passes=metadata.get("PASSES", []),
+                            description=metadata.get("DESCRIPTION", ""),
+                            categories=metadata.get("CATEGORIES", []),
+                            inputs=metadata.get("INPUTS", []),
                         )
 
                         if is_multipass:
@@ -195,7 +195,8 @@ class ISFDiscovery:
             Filtered list of ISFInfo objects
         """
         return [
-            shader for shader in shader_list
+            shader
+            for shader in shader_list
             if category.lower() in [cat.lower() for cat in shader.categories]
         ]
 
@@ -209,23 +210,23 @@ class ISFDiscovery:
         multipass, single_pass = self.get_cached()
 
         data = {
-            'multipass': [
+            "multipass": [
                 {
-                    'path': str(shader.path),
-                    'passes': shader.passes,
-                    'description': shader.description,
-                    'categories': shader.categories,
-                    'inputs': [inp.get('NAME', '') for inp in shader.inputs]
+                    "path": str(shader.path),
+                    "passes": shader.passes,
+                    "description": shader.description,
+                    "categories": shader.categories,
+                    "inputs": [inp.get("NAME", "") for inp in shader.inputs],
                 }
                 for shader in multipass
             ],
-            'single_pass': [str(shader.path) for shader in single_pass],
-            'summary': {
-                'total_multipass': len(multipass),
-                'total_single_pass': len(single_pass),
-                'total': len(multipass) + len(single_pass)
-            }
+            "single_pass": [str(shader.path) for shader in single_pass],
+            "summary": {
+                "total_multipass": len(multipass),
+                "total_single_pass": len(single_pass),
+                "total": len(multipass) + len(single_pass),
+            },
         }
 
-        with open(output_path, 'w') as f:
+        with open(output_path, "w") as f:
             json.dump(data, f, indent=2)

@@ -335,9 +335,9 @@ class TestISFConverter:
         params = [
             Parameter(ParamType.CLOCK, "Time", "TIME", properties={}),
             Parameter(ParamType.FRAME_RESOLUTION, "Resolution", "RENDERSIZE", properties={}),
-            Parameter(ParamType.CONSTANT_FLOAT1, "Speed", "speed", properties={'value': 1.0}),
+            Parameter(ParamType.CONSTANT_FLOAT1, "Speed", "speed", properties={"value": 1.0}),
             Parameter(ParamType.CONSTANT_FLOAT4, "Color", "color", properties={}),
-            Parameter(ParamType.CONSTANT_TEXTURE_2D, "Input", "inputImage", properties={})
+            Parameter(ParamType.CONSTANT_TEXTURE_2D, "Input", "inputImage", properties={}),
         ]
 
         code = "void main() { gl_FragColor = vec4(1.0); }"
@@ -470,8 +470,15 @@ void main() {
 
         shader = ISFShader()
         params = [
-            Parameter(ParamType.CONSTANT_FLOAT1, "Enable Effect", "enableEffect", properties={'value': 1.0}),
-            Parameter(ParamType.CONSTANT_FLOAT1, "Show Background", "showBg", properties={'value': 0.0}),
+            Parameter(
+                ParamType.CONSTANT_FLOAT1,
+                "Enable Effect",
+                "enableEffect",
+                properties={"value": 1.0},
+            ),
+            Parameter(
+                ParamType.CONSTANT_FLOAT1, "Show Background", "showBg", properties={"value": 0.0}
+            ),
         ]
 
         code_with_bool_comparisons = """
@@ -520,43 +527,31 @@ void main() {
 
         # Float input
         float_input = ISFInput(
-            name="speed",
-            input_type="float",
-            default=1.0,
-            min_val=0.0,
-            max_val=10.0
+            name="speed", input_type="float", default=1.0, min_val=0.0, max_val=10.0
         )
         param = convert_isf_input_to_parameter(float_input)
         assert param is not None
         assert param.param_type == ParamType.CONSTANT_FLOAT1
         assert param.variable_name == "speed"
-        assert param.properties['value'] == 1.0
-        assert param.properties['min'] == 0.0
-        assert param.properties['max'] == 10.0
+        assert param.properties["value"] == 1.0
+        assert param.properties["min"] == 0.0
+        assert param.properties["max"] == 10.0
 
         # Color input
-        color_input = ISFInput(
-            name="tint",
-            input_type="color",
-            default=[1.0, 0.5, 0.0, 1.0]
-        )
+        color_input = ISFInput(name="tint", input_type="color", default=[1.0, 0.5, 0.0, 1.0])
         param = convert_isf_input_to_parameter(color_input)
         assert param is not None
         assert param.param_type == ParamType.CONSTANT_FLOAT4
-        assert param.properties['value'].x == 1.0
-        assert param.properties['value'].y == 0.5
+        assert param.properties["value"].x == 1.0
+        assert param.properties["value"].y == 0.5
 
         # Point2D input
-        point_input = ISFInput(
-            name="pos",
-            input_type="point2D",
-            default=[0.5, 0.5]
-        )
+        point_input = ISFInput(name="pos", input_type="point2D", default=[0.5, 0.5])
         param = convert_isf_input_to_parameter(point_input)
         assert param is not None
         assert param.param_type == ParamType.CONSTANT_FLOAT2
-        assert param.properties['value'].x == 0.5
-        assert param.properties['value'].y == 0.5
+        assert param.properties["value"].x == 0.5
+        assert param.properties["value"].y == 0.5
 
     def test_custom_resolution(self, tmp_path):
         """Test converting with custom resolution."""
@@ -564,12 +559,7 @@ void main() {
         isf_file.write_text(SIMPLE_ISF)
 
         output_file = tmp_path / "test.klproj"
-        convert_isf_to_kodelife(
-            str(isf_file),
-            str(output_file),
-            width=1280,
-            height=720
-        )
+        convert_isf_to_kodelife(str(isf_file), str(output_file), width=1280, height=720)
 
         assert output_file.exists()
 
@@ -670,10 +660,11 @@ void main() {
 
         # Parse to verify buffer configuration
         from klproj.isf_parser import parse_isf_file
+
         shader = parse_isf_file(str(isf_file))
         assert len(shader.passes) == 3
         assert not shader.passes[0].persistent  # tempBuffer is not persistent
-        assert shader.passes[1].persistent      # persistentBuffer is persistent
+        assert shader.passes[1].persistent  # persistentBuffer is persistent
 
     def test_audio_input_types(self):
         """Test audio and audioFFT input type conversion."""
@@ -682,9 +673,7 @@ void main() {
 
         # Audio waveform input
         audio_input = ISFInput(
-            name="audioInput",
-            input_type="audio",
-            max_val=256  # Number of samples
+            name="audioInput", input_type="audio", max_val=256  # Number of samples
         )
         param = convert_isf_input_to_parameter(audio_input)
         assert param is not None
@@ -693,9 +682,7 @@ void main() {
 
         # Audio FFT input
         fft_input = ISFInput(
-            name="audioFFT",
-            input_type="audioFFT",
-            max_val=128  # Number of FFT bins
+            name="audioFFT", input_type="audioFFT", max_val=128  # Number of FFT bins
         )
         param = convert_isf_input_to_parameter(fft_input)
         assert param is not None
@@ -707,18 +694,15 @@ void main() {
         from klproj.isf_parser import ISFInput
         from klproj.types import ParamType
 
-        event_input = ISFInput(
-            name="trigger",
-            input_type="event"
-        )
+        event_input = ISFInput(name="trigger", input_type="event")
         param = convert_isf_input_to_parameter(event_input)
         assert param is not None
         assert param.param_type == ParamType.CONSTANT_FLOAT1
         assert param.variable_name == "trigger"
         # Events should default to 0.0 (off)
-        assert param.properties['value'] == 0.0
-        assert param.properties['min'] == 0.0
-        assert param.properties['max'] == 1.0
+        assert param.properties["value"] == 0.0
+        assert param.properties["min"] == 0.0
+        assert param.properties["max"] == 1.0
 
     def test_credit_attribute_parsing(self):
         """Test that CREDIT attribute is correctly parsed."""
@@ -744,10 +728,7 @@ class TestRealISFFiles:
         docs_dir = "/Users/andre/work/graphics/shaders/kodelife-generator/docs/ISF"
 
         # Test the example files
-        example_files = [
-            "e37459.3.frag",
-            "e42912.0.frag"
-        ]
+        example_files = ["e37459.3.frag", "e42912.0.frag"]
 
         for filename in example_files:
             file_path = os.path.join(docs_dir, filename)
@@ -761,10 +742,7 @@ class TestRealISFFiles:
         """Test converting real ISF files to KodeLife."""
         docs_dir = "/Users/andre/work/graphics/shaders/kodelife-generator/docs/ISF"
 
-        example_files = [
-            "e37459.3.frag",
-            "e42912.0.frag"
-        ]
+        example_files = ["e37459.3.frag", "e42912.0.frag"]
 
         for filename in example_files:
             file_path = os.path.join(docs_dir, filename)
@@ -811,6 +789,9 @@ class TestRealISFFiles:
         assert "IMG_PIXEL" not in adapted_code
 
         # Should contain proper GLSL replacements
-        assert "gl_FragCoord.xy / RENDERSIZE" in adapted_code or "(gl_FragCoord.xy / RENDERSIZE)" in adapted_code
+        assert (
+            "gl_FragCoord.xy / RENDERSIZE" in adapted_code
+            or "(gl_FragCoord.xy / RENDERSIZE)" in adapted_code
+        )
         assert "texture(inputImage" in adapted_code
         assert "fragColor" in adapted_code
