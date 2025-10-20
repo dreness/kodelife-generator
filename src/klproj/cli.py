@@ -217,7 +217,7 @@ def create_watch_project(
             output_dir.mkdir(parents=True, exist_ok=True)
 
         # Create builder
-        profile = ShaderProfile[api] if hasattr(ShaderProfile, api) else ShaderProfile.GL3
+        profile = ShaderProfile.__members__.get(api, ShaderProfile.GL3)
         builder = KodeProjBuilder(api=api)
         builder.set_resolution(width, height)
         builder.set_author("klproj-generator")
