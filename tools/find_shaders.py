@@ -36,7 +36,7 @@ import sys
 from pathlib import Path
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from klproj.utils.isf_discovery import ISFDiscovery
 
@@ -81,7 +81,7 @@ class DiscoveryReporter:
         if shader.categories:
             print(f"   Categories: {', '.join(shader.categories)}")
         if shader.inputs:
-            input_names = [inp.get('NAME', 'unnamed') for inp in shader.inputs]
+            input_names = [inp.get("NAME", "unnamed") for inp in shader.inputs]
             print(f"   Inputs: {', '.join(input_names)}")
 
     def print_statistics(self, multipass, single_pass, categories=None):
@@ -115,72 +115,55 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Discover and catalog ISF shader files",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
 
     parser.add_argument(
-        '-d', '--isf-dir',
-        action='append',
-        dest='isf_dirs',
-        help='ISF directory to search (can be specified multiple times). '
-             'Default: /Users/andre/Library/Graphics/ISF'
+        "-d",
+        "--isf-dir",
+        action="append",
+        dest="isf_dirs",
+        help="ISF directory to search (can be specified multiple times). "
+        "Default: /Users/andre/Library/Graphics/ISF",
     )
 
     # Filtering options
-    parser.add_argument(
-        '--multipass-only',
-        action='store_true',
-        help='Only show multipass shaders'
-    )
+    parser.add_argument("--multipass-only", action="store_true", help="Only show multipass shaders")
+
+    parser.add_argument("--single-only", action="store_true", help="Only show single-pass shaders")
+
+    parser.add_argument("--category", help="Filter by category (case-insensitive substring match)")
 
     parser.add_argument(
-        '--single-only',
-        action='store_true',
-        help='Only show single-pass shaders'
-    )
-
-    parser.add_argument(
-        '--category',
-        help='Filter by category (case-insensitive substring match)'
-    )
-
-    parser.add_argument(
-        '--min-passes',
+        "--min-passes",
         type=int,
-        metavar='N',
-        help='Only show multipass shaders with at least N passes'
+        metavar="N",
+        help="Only show multipass shaders with at least N passes",
     )
 
     # Output options
     parser.add_argument(
-        '-o', '--output',
-        default='multipass_isf_shaders.json',
-        help='Output JSON file (default: multipass_isf_shaders.json)'
+        "-o",
+        "--output",
+        default="multipass_isf_shaders.json",
+        help="Output JSON file (default: multipass_isf_shaders.json)",
     )
 
-    parser.add_argument(
-        '--no-save',
-        action='store_true',
-        help='Do not save results to JSON file'
-    )
+    parser.add_argument("--no-save", action="store_true", help="Do not save results to JSON file")
 
     parser.add_argument(
-        '--stats-only',
-        action='store_true',
-        help='Only show statistics, do not list individual shaders'
+        "--stats-only",
+        action="store_true",
+        help="Only show statistics, do not list individual shaders",
     )
 
     # Reporting options
     parser.add_argument(
-        '-v', '--verbose',
-        action='store_true',
-        help='Show detailed information about each shader'
+        "-v", "--verbose", action="store_true", help="Show detailed information about each shader"
     )
 
     parser.add_argument(
-        '-q', '--quiet',
-        action='store_true',
-        help='Suppress output except statistics'
+        "-q", "--quiet", action="store_true", help="Suppress output except statistics"
     )
 
     return parser.parse_args()
@@ -263,5 +246,5 @@ def main():
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())

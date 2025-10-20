@@ -43,7 +43,7 @@ import sys
 from pathlib import Path
 
 # Add src to path for imports
-sys.path.insert(0, str(Path(__file__).parent.parent / 'src'))
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
 from klproj.utils.batch_processor import BatchConverter
 from klproj.utils.isf_discovery import ISFDiscovery
@@ -55,119 +55,97 @@ def parse_args():
     parser = argparse.ArgumentParser(
         description="Batch convert ISF files to .klproj format",
         formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=__doc__
+        epilog=__doc__,
     )
 
     # ISF source directories
     parser.add_argument(
-        '-d', '--isf-dir',
-        action='append',
-        dest='isf_dirs',
-        help='ISF source directory (can be specified multiple times). '
-             'Default: /Users/andre/Library/Graphics/ISF'
+        "-d",
+        "--isf-dir",
+        action="append",
+        dest="isf_dirs",
+        help="ISF source directory (can be specified multiple times). "
+        "Default: /Users/andre/Library/Graphics/ISF",
     )
 
     parser.add_argument(
-        '-o', '--output-dir',
-        default='./isf_conversions',
-        help='Output directory for .klproj files (default: ./isf_conversions)'
+        "-o",
+        "--output-dir",
+        default="./isf_conversions",
+        help="Output directory for .klproj files (default: ./isf_conversions)",
     )
 
     # Selection strategies (mutually exclusive)
     strategy = parser.add_mutually_exclusive_group()
 
     strategy.add_argument(
-        '--random',
-        type=int,
-        metavar='N',
-        help='Convert N randomly selected files'
+        "--random", type=int, metavar="N", help="Convert N randomly selected files"
     )
 
     strategy.add_argument(
-        '--multipass-only',
-        action='store_true',
-        help='Convert only multipass shaders (ignores single-pass)'
+        "--multipass-only",
+        action="store_true",
+        help="Convert only multipass shaders (ignores single-pass)",
     )
 
     strategy.add_argument(
-        '--single-only',
-        action='store_true',
-        help='Convert only single-pass shaders (ignores multipass)'
+        "--single-only",
+        action="store_true",
+        help="Convert only single-pass shaders (ignores multipass)",
     )
 
     strategy.add_argument(
-        '--mixed',
+        "--mixed",
         nargs=2,
         type=int,
-        metavar=('MULTI', 'SINGLE'),
-        help='Convert M multipass + N single-pass files (shuffled)'
+        metavar=("MULTI", "SINGLE"),
+        help="Convert M multipass + N single-pass files (shuffled)",
     )
 
     strategy.add_argument(
-        '--all',
-        action='store_true',
-        help='Convert all discovered ISF files (use with caution!)'
+        "--all", action="store_true", help="Convert all discovered ISF files (use with caution!)"
     )
 
     # Conversion options
     parser.add_argument(
-        '-w', '--width',
-        type=int,
-        default=1920,
-        help='Project width in pixels (default: 1920)'
+        "-w", "--width", type=int, default=1920, help="Project width in pixels (default: 1920)"
     )
 
     parser.add_argument(
-        '--height',
-        type=int,
-        default=1080,
-        help='Project height in pixels (default: 1080)'
+        "--height", type=int, default=1080, help="Project height in pixels (default: 1080)"
     )
 
     parser.add_argument(
-        '-a', '--api',
-        choices=['GL2', 'GL3', 'MTL', 'ES3'],
-        default='GL3',
-        help='Graphics API profile (default: GL3)'
+        "-a",
+        "--api",
+        choices=["GL2", "GL3", "MTL", "ES3"],
+        default="GL3",
+        help="Graphics API profile (default: GL3)",
     )
 
-    parser.add_argument(
-        '--overwrite',
-        action='store_true',
-        help='Overwrite existing .klproj files'
-    )
+    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing .klproj files")
 
     # Output options
     parser.add_argument(
-        '--save-results',
-        metavar='FILE',
-        default='conversion_results.json',
-        help='Save conversion results to JSON file (default: conversion_results.json)'
+        "--save-results",
+        metavar="FILE",
+        default="conversion_results.json",
+        help="Save conversion results to JSON file (default: conversion_results.json)",
     )
 
     parser.add_argument(
-        '--no-save-results',
-        action='store_true',
-        help='Do not save results to JSON file'
+        "--no-save-results", action="store_true", help="Do not save results to JSON file"
     )
 
     parser.add_argument(
-        '--save-discovery',
-        metavar='FILE',
-        help='Save ISF discovery results to JSON file'
+        "--save-discovery", metavar="FILE", help="Save ISF discovery results to JSON file"
     )
 
     # Reporting options
-    parser.add_argument(
-        '-v', '--verbose',
-        action='store_true',
-        help='Enable verbose output'
-    )
+    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
 
     parser.add_argument(
-        '-q', '--quiet',
-        action='store_true',
-        help='Suppress progress output (only show summary)'
+        "-q", "--quiet", action="store_true", help="Suppress progress output (only show summary)"
     )
 
     return parser.parse_args()
@@ -245,16 +223,13 @@ def main():
         api=args.api,
         width=args.width,
         height=args.height,
-        overwrite=args.overwrite
+        overwrite=args.overwrite,
     )
 
     # Convert batch
     reporter.print_section("CONVERTING FILES", width=80)
 
-    result = converter.convert_batch(
-        files=selected,
-        reporter=reporter.report_progress
-    )
+    result = converter.convert_batch(files=selected, reporter=reporter.report_progress)
 
     # Report success/errors for each file
     for output_path in result.successful:
@@ -279,5 +254,5 @@ def main():
     return 0 if result.success_count > 0 else 1
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     sys.exit(main())
