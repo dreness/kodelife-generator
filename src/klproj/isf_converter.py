@@ -1,7 +1,17 @@
 """
 ISF to KodeLife converter.
 
-This module provides functionality to convert ISF shaders to KodeLife projects.
+This module converts ISF shaders to KodeLife projects by:
+1. Parsing ISF JSON metadata (see isf_parser.py)
+2. Mapping ISF variables to KodeLife parameters
+3. Adapting ISF shader code to standard GLSL
+4. Generating proper uniform declarations
+
+ISF Specification References:
+- Variables: docs/ISF/isf-docs/pages/ref/ref_variables.md
+- Functions: docs/ISF/isf-docs/pages/ref/ref_functions.md
+- Converting GLSL: docs/ISF/isf-docs/pages/ref/ref_converting.md
+- Multi-pass: docs/ISF/isf-docs/pages/ref/ref_multipass.md
 """
 
 from typing import List, Optional
@@ -25,16 +35,17 @@ from .helpers import create_mvp_param
 
 
 # ISF to KodeLife parameter type mapping
+# ISF input types: docs/ISF/isf-docs/pages/ref/ref_json.md (TYPE values)
 ISF_TO_KODELIFE_PARAM_TYPE = {
-    'event': ParamType.CONSTANT_FLOAT1,  # Map to boolean float (0.0 or 1.0)
-    'bool': ParamType.CONSTANT_FLOAT1,  # Use float, 0.0 or 1.0
-    'long': ParamType.CONSTANT_FLOAT1,  # Use float for selection
-    'float': ParamType.CONSTANT_FLOAT1,
-    'point2D': ParamType.CONSTANT_FLOAT2,
-    'color': ParamType.CONSTANT_FLOAT4,
-    'image': ParamType.CONSTANT_TEXTURE_2D,
-    'audio': ParamType.CONSTANT_TEXTURE_2D,  # Audio as texture
-    'audioFFT': ParamType.CONSTANT_TEXTURE_2D,  # FFT as texture
+    'event': ParamType.CONSTANT_FLOAT1,  # Momentary button
+    'bool': ParamType.CONSTANT_FLOAT1,   # Boolean (0.0 or 1.0)
+    'long': ParamType.CONSTANT_FLOAT1,   # Integer/enum selector
+    'float': ParamType.CONSTANT_FLOAT1,  # Floating point value
+    'point2D': ParamType.CONSTANT_FLOAT2,  # 2D coordinate
+    'color': ParamType.CONSTANT_FLOAT4,  # RGBA color
+    'image': ParamType.CONSTANT_TEXTURE_2D,  # Texture input
+    'audio': ParamType.CONSTANT_TEXTURE_2D,  # Audio waveform as texture
+    'audioFFT': ParamType.CONSTANT_TEXTURE_2D,  # Audio FFT as texture
 }
 
 
@@ -177,6 +188,11 @@ def adapt_isf_shader_code(shader_code: str, isf_shader: ISFShader, parameters: L
     - Removes deprecated varying keyword for GL3
     - Ensures proper GLSL version and output variable
 
+    ISF References:
+    - Variables: docs/ISF/isf-docs/pages/ref/ref_variables.md
+    - Functions: docs/ISF/isf-docs/pages/ref/ref_functions.md
+    - Converting: docs/ISF/isf-docs/pages/ref/ref_converting.md
+
     Args:
         shader_code: Original ISF shader code
         isf_shader: Parsed ISF shader metadata
@@ -211,6 +227,11 @@ def adapt_isf_shader_code(shader_code: str, isf_shader: ISFShader, parameters: L
     # IMG_THIS_PIXEL(image) -> texture(image, gl_FragCoord.xy / RENDERSIZE)
     # This must come before IMG_NORM_PIXEL to avoid partial matches
     code = re.sub(r'\bIMG_THIS_PIXEL\s*\(\s*(\w+)\s*\)',
+                  r'texture(\1, gl_FragCoord.xy / RENDERSIZE)', code)
+
+    # IMG_NORM_THIS_PIXEL(image) -> texture(image, gl_FragCoord.xy / RENDERSIZE)
+    # Equivalent to IMG_THIS_PIXEL in practice
+    code = re.sub(r'\bIMG_NORM_THIS_PIXEL\s*\(\s*(\w+)\s*\)',
                   r'texture(\1, gl_FragCoord.xy / RENDERSIZE)', code)
 
     # IMG_NORM_PIXEL(image, coord) -> texture(image, coord)

@@ -23,6 +23,9 @@ def create_shadertoy_params() -> List[Parameter]:
     - iDate: Current date (year, month, day, seconds) (vec4)
     - iSampleRate: Audio sample rate (float)
 
+    Note: These are similar to ISF standard variables but use Shadertoy naming.
+    ISF equivalent: docs/ISF/isf-docs/pages/ref/ref_variables.md
+
     Returns:
         List of Parameter objects for Shadertoy compatibility
 

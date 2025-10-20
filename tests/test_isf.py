@@ -583,6 +583,169 @@ void main() {
 
         assert output_file.exists()
 
+    def test_img_norm_this_pixel_replacement(self):
+        """Test IMG_NORM_THIS_PIXEL macro replacement."""
+        from klproj.isf_parser import ISFShader
+
+        shader = ISFShader()
+        params = []  # Empty for this test
+
+        code_with_norm_this_pixel = """
+void main() {
+    vec4 color = IMG_NORM_THIS_PIXEL(inputImage);
+    gl_FragColor = color * 0.75;
+}
+"""
+        adapted = adapt_isf_shader_code(code_with_norm_this_pixel, shader, params)
+        assert "IMG_NORM_THIS_PIXEL" not in adapted
+        assert "texture(inputImage, gl_FragCoord.xy / RENDERSIZE)" in adapted
+
+    def test_multipass_width_height_expressions(self):
+        """Test multi-pass shader with WIDTH/HEIGHT dimension expressions."""
+        from klproj.isf_converter import evaluate_pass_dimension
+
+        # Test simple division
+        result = evaluate_pass_dimension("$WIDTH / 2.0", 1920, 1080)
+        assert result == 960
+
+        # Test floor function
+        result = evaluate_pass_dimension("floor($HEIGHT * 0.5)", 1920, 1080)
+        assert result == 540
+
+        # Test max function
+        result = evaluate_pass_dimension("max($WIDTH*0.25, 1.0)", 1920, 1080)
+        assert result == 480
+
+        # Test integer literal
+        result = evaluate_pass_dimension(256, 1920, 1080)
+        assert result == 256
+
+        # Test ceil function
+        result = evaluate_pass_dimension("ceil($WIDTH / 16.0)", 1920, 1080)
+        assert result == 120
+
+    def test_persistent_vs_nonpersistent_buffers(self, tmp_path):
+        """Test that persistent and non-persistent buffers are handled correctly."""
+
+        # Multi-pass shader with both persistent and non-persistent buffers
+        multipass_isf = """/*
+{
+  "DESCRIPTION": "Multi-pass with mixed buffer types",
+  "ISFVSN": "2",
+  "PASSES": [
+    {
+      "TARGET": "tempBuffer",
+      "PERSISTENT": false,
+      "WIDTH": "$WIDTH/2.0",
+      "HEIGHT": "$HEIGHT/2.0"
+    },
+    {
+      "TARGET": "persistentBuffer",
+      "PERSISTENT": true,
+      "FLOAT": true
+    },
+    {
+    }
+  ]
+}
+*/
+
+void main() {
+    if (PASSINDEX == 0) {
+        // First pass - render to tempBuffer
+        gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);
+    }
+    else if (PASSINDEX == 1) {
+        // Second pass - can access tempBuffer, render to persistentBuffer
+        vec4 temp = IMG_THIS_PIXEL(tempBuffer);
+        vec4 persistent = IMG_THIS_PIXEL(persistentBuffer);
+        gl_FragColor = mix(temp, persistent, 0.5);
+    }
+    else {
+        // Final pass - can access both buffers
+        vec4 temp = IMG_THIS_PIXEL(tempBuffer);
+        vec4 persistent = IMG_THIS_PIXEL(persistentBuffer);
+        gl_FragColor = temp + persistent;
+    }
+}
+"""
+
+        isf_file = tmp_path / "multipass.fs"
+        isf_file.write_text(multipass_isf)
+
+        output_file = tmp_path / "multipass.klproj"
+        result = convert_isf_to_kodelife(str(isf_file), str(output_file))
+
+        assert os.path.exists(result)
+        assert os.path.getsize(result) > 0
+
+        # Parse to verify buffer configuration
+        from klproj.isf_parser import parse_isf_file
+        shader = parse_isf_file(str(isf_file))
+        assert len(shader.passes) == 3
+        assert not shader.passes[0].persistent  # tempBuffer is not persistent
+        assert shader.passes[1].persistent      # persistentBuffer is persistent
+
+    def test_audio_input_types(self):
+        """Test audio and audioFFT input type conversion."""
+        from klproj.isf_parser import ISFInput
+        from klproj.types import ParamType
+
+        # Audio waveform input
+        audio_input = ISFInput(
+            name="audioInput",
+            input_type="audio",
+            max_val=256  # Number of samples
+        )
+        param = convert_isf_input_to_parameter(audio_input)
+        assert param is not None
+        assert param.param_type == ParamType.CONSTANT_TEXTURE_2D
+        assert param.variable_name == "audioInput"
+
+        # Audio FFT input
+        fft_input = ISFInput(
+            name="audioFFT",
+            input_type="audioFFT",
+            max_val=128  # Number of FFT bins
+        )
+        param = convert_isf_input_to_parameter(fft_input)
+        assert param is not None
+        assert param.param_type == ParamType.CONSTANT_TEXTURE_2D
+        assert param.variable_name == "audioFFT"
+
+    def test_event_input_type(self):
+        """Test event input type conversion (momentary button)."""
+        from klproj.isf_parser import ISFInput
+        from klproj.types import ParamType
+
+        event_input = ISFInput(
+            name="trigger",
+            input_type="event"
+        )
+        param = convert_isf_input_to_parameter(event_input)
+        assert param is not None
+        assert param.param_type == ParamType.CONSTANT_FLOAT1
+        assert param.variable_name == "trigger"
+        # Events should default to 0.0 (off)
+        assert param.properties['value'] == 0.0
+        assert param.properties['min'] == 0.0
+        assert param.properties['max'] == 1.0
+
+    def test_credit_attribute_parsing(self):
+        """Test that CREDIT attribute is correctly parsed."""
+        isf_with_credit = """/*
+{
+  "DESCRIPTION": "Test shader",
+  "CREDIT": "by VIDVOX",
+  "ISFVSN": "2"
+}
+*/
+void main() { gl_FragColor = vec4(1.0); }
+"""
+        shader = parse_isf_string(isf_with_credit)
+        assert shader.credit == "by VIDVOX"
+        assert shader.description == "Test shader"
+
 
 class TestRealISFFiles:
     """Test with real ISF files from the docs directory."""

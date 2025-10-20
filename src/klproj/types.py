@@ -70,7 +70,14 @@ class ParamType(Enum):
     Parameter types for uniforms.
 
     These represent various built-in and custom parameter types that can be
-    passed to shaders:
+    passed to shaders.
+
+    ISF-Related Parameters (see docs/ISF/isf-docs/pages/ref/ref_variables.md):
+    - CLOCK: Maps to ISF uniform float TIME (seconds since start)
+    - FRAME_RESOLUTION: Maps to ISF uniform vec2 RENDERSIZE (render target dimensions)
+    - DATE: Maps to ISF uniform vec4 DATE (year, month, day, seconds)
+    - FRAME_DELTA: Maps to ISF uniform float TIMEDELTA (time since last frame)
+    - FRAME_NUMBER: Maps to ISF uniform int FRAMEINDEX (frame counter)
 
     Time/Frame Parameters:
     - CLOCK: Time in seconds
@@ -93,7 +100,7 @@ class ParamType(Enum):
 
     Frame Buffers:
     - FRAME_PREV_FRAME: Previous frame texture
-    - FRAME_PREV_PASS: Previous pass texture
+    - FRAME_PREV_PASS: Previous pass texture (used for ISF persistent buffers)
 
     Transforms:
     - TRANSFORM_MVP: Model-View-Projection matrix

@@ -3,6 +3,11 @@ ISF (Interactive Shader Format) parser.
 
 This module provides functionality to parse ISF files and extract their
 metadata and shader code for conversion to KodeLife projects.
+
+ISF Specification References:
+- JSON Format: docs/ISF/isf-docs/pages/ref/ref_json.md
+- Variables: docs/ISF/isf-docs/pages/ref/ref_variables.md
+- Multi-pass: docs/ISF/isf-docs/pages/ref/ref_multipass.md
 """
 
 import json
@@ -13,7 +18,14 @@ from typing import Dict, List, Optional, Any
 
 @dataclass
 class ISFInput:
-    """ISF input parameter definition."""
+    """
+    ISF input parameter definition.
+
+    Corresponds to entries in the INPUTS array in ISF JSON.
+    See: docs/ISF/isf-docs/pages/ref/ref_json.md (INPUTS section)
+
+    Supported types: event, bool, long, float, point2D, color, image, audio, audioFFT
+    """
     name: str
     input_type: str
     label: Optional[str] = None
@@ -27,7 +39,12 @@ class ISFInput:
 
 @dataclass
 class ISFPass:
-    """ISF rendering pass definition."""
+    """
+    ISF rendering pass definition.
+
+    Corresponds to entries in the PASSES array for multi-pass shaders.
+    See: docs/ISF/isf-docs/pages/ref/ref_multipass.md
+    """
     target: Optional[str] = None  # None means render to final output
     persistent: bool = False
     float_precision: bool = False
@@ -51,6 +68,7 @@ class ISFShader:
     isfvsn: str = "2"
     vsn: Optional[str] = None
     description: Optional[str] = None
+    credit: Optional[str] = None
     categories: List[str] = field(default_factory=list)
     inputs: List[ISFInput] = field(default_factory=list)
     passes: List[ISFPass] = field(default_factory=list)
@@ -128,6 +146,7 @@ def parse_isf_string(content: str) -> ISFShader:
     shader.isfvsn = metadata.get('ISFVSN', '2')
     shader.vsn = metadata.get('VSN')
     shader.description = metadata.get('DESCRIPTION')
+    shader.credit = metadata.get('CREDIT')
     shader.categories = metadata.get('CATEGORIES', [])
 
     # Parse inputs
