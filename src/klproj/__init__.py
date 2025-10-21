@@ -10,11 +10,15 @@ Also includes ISF (Interactive Shader Format) parsing and conversion utilities.
 
 from .generator import KodeProjBuilder
 from .helpers import (
+    create_default_vertex_stage,
+    create_file_watch_stage,
+    create_fragment_file_watch_stage,
     create_mouse_param,
     create_mvp_param,
     create_resolution_param,
     create_shadertoy_params,
     create_time_param,
+    create_vertex_file_watch_stage,
 )
 from .isf_converter import convert_isf_to_kodelife
 from .isf_parser import (
@@ -71,6 +75,10 @@ __all__ = [
     "create_time_param",
     "create_resolution_param",
     "create_mouse_param",
+    "create_file_watch_stage",
+    "create_vertex_file_watch_stage",
+    "create_fragment_file_watch_stage",
+    "create_default_vertex_stage",
     # Metal Helpers
     "generate_metal_vertex_shader",
     "generate_metal_fragment_shader_shadertoy",

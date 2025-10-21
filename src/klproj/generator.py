@@ -283,8 +283,8 @@ class KodeProjBuilder:
         ET.SubElement(props, "enabled").text = str(stage.enabled)
         ET.SubElement(props, "hidden").text = str(stage.hidden)
         ET.SubElement(props, "locked").text = "0"
-        ET.SubElement(props, "fileWatch").text = "0"
-        ET.SubElement(props, "fileWatchPath").text = ""
+        ET.SubElement(props, "fileWatch").text = "1" if stage.file_watch else "0"
+        ET.SubElement(props, "fileWatchPath").text = stage.file_watch_path
         ET.SubElement(props, "uiExpanded").text = "1"
 
         # Parameters
