@@ -103,16 +103,25 @@ def parse_args():
     )
 
     strategy.add_argument(
-        "--all", action="store_true", help="Convert all discovered ISF files (use with caution!)"
+        "--all",
+        action="store_true",
+        help="Convert all discovered ISF files (use with caution!)",
     )
 
     # Conversion options
     parser.add_argument(
-        "-w", "--width", type=int, default=1920, help="Project width in pixels (default: 1920)"
+        "-w",
+        "--width",
+        type=int,
+        default=1920,
+        help="Project width in pixels (default: 1920)",
     )
 
     parser.add_argument(
-        "--height", type=int, default=1080, help="Project height in pixels (default: 1080)"
+        "--height",
+        type=int,
+        default=1080,
+        help="Project height in pixels (default: 1080)",
     )
 
     parser.add_argument(
@@ -123,7 +132,9 @@ def parse_args():
         help="Graphics API profile (default: GL3)",
     )
 
-    parser.add_argument("--overwrite", action="store_true", help="Overwrite existing .klproj files")
+    parser.add_argument(
+        "--overwrite", action="store_true", help="Overwrite existing .klproj files"
+    )
 
     # Output options
     parser.add_argument(
@@ -134,18 +145,27 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--no-save-results", action="store_true", help="Do not save results to JSON file"
+        "--no-save-results",
+        action="store_true",
+        help="Do not save results to JSON file",
     )
 
     parser.add_argument(
-        "--save-discovery", metavar="FILE", help="Save ISF discovery results to JSON file"
+        "--save-discovery",
+        metavar="FILE",
+        help="Save ISF discovery results to JSON file",
     )
 
     # Reporting options
-    parser.add_argument("-v", "--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable verbose output"
+    )
 
     parser.add_argument(
-        "-q", "--quiet", action="store_true", help="Suppress progress output (only show summary)"
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="Suppress progress output (only show summary)",
     )
 
     return parser.parse_args()
@@ -199,7 +219,9 @@ def main():
     elif args.mixed:
         num_multi, num_single = args.mixed
         selected = discovery.select_mixed(num_multi, num_single)
-        strategy_desc = f"Mixed selection ({num_multi} multipass + {num_single} single-pass)"
+        strategy_desc = (
+            f"Mixed selection ({num_multi} multipass + {num_single} single-pass)"
+        )
 
     elif args.all:
         selected = multipass + single_pass

@@ -556,7 +556,10 @@ void main() {
             output_dir = os.path.join(tmpdir, "output")
 
             # Convert: JSON + direct ISF file
-            with patch("sys.argv", ["klproj", "convert", json_path, isf2_path, "-o", output_dir]):
+            with patch(
+                "sys.argv",
+                ["klproj", "convert", json_path, isf2_path, "-o", output_dir],
+            ):
                 result = main()
 
             # Verify both were converted

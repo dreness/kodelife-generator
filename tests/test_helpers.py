@@ -346,7 +346,12 @@ class TestHelpersIntegration:
         resolution = create_resolution_param()
         mouse = create_mouse_param()
 
-        param_types = {mvp.param_type, time.param_type, resolution.param_type, mouse.param_type}
+        param_types = {
+            mvp.param_type,
+            time.param_type,
+            resolution.param_type,
+            mouse.param_type,
+        }
         assert len(param_types) == 4  # All should be unique
 
     def test_shadertoy_compatibility(self):

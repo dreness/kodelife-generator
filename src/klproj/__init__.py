@@ -29,6 +29,13 @@ from .isf_parser import (
     parse_isf_file,
     parse_isf_string,
 )
+from .metal_helpers import (
+    create_metal_fragment_source_shadertoy,
+    create_metal_vertex_source,
+    generate_metal_compute_shader,
+    generate_metal_fragment_shader_shadertoy,
+    generate_metal_vertex_shader,
+)
 from .types import (
     Parameter,
     ParamType,
@@ -72,6 +79,12 @@ __all__ = [
     "create_vertex_file_watch_stage",
     "create_fragment_file_watch_stage",
     "create_default_vertex_stage",
+    # Metal Helpers
+    "generate_metal_vertex_shader",
+    "generate_metal_fragment_shader_shadertoy",
+    "generate_metal_compute_shader",
+    "create_metal_vertex_source",
+    "create_metal_fragment_source_shadertoy",
     # ISF Parser
     "ISFShader",
     "ISFInput",

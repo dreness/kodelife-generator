@@ -298,13 +298,24 @@ def main():
         "-o", "--output-dir", help="Output directory (default: same as input file)"
     )
     convert_parser.add_argument(
-        "-w", "--width", type=int, default=1920, help="Project width in pixels (default: 1920)"
+        "-w",
+        "--width",
+        type=int,
+        default=1920,
+        help="Project width in pixels (default: 1920)",
     )
     convert_parser.add_argument(
-        "--height", type=int, default=1080, help="Project height in pixels (default: 1080)"
+        "--height",
+        type=int,
+        default=1080,
+        help="Project height in pixels (default: 1080)",
     )
     convert_parser.add_argument(
-        "-a", "--api", choices=["GL2", "GL3"], default="GL3", help="Graphics API (default: GL3)"
+        "-a",
+        "--api",
+        choices=["GL2", "GL3"],
+        default="GL3",
+        help="Graphics API (default: GL3)",
     )
 
     # Create command (file watching)
