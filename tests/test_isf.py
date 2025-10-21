@@ -477,7 +477,10 @@ void main() {
                 properties={"value": 1.0},
             ),
             Parameter(
-                ParamType.CONSTANT_FLOAT1, "Show Background", "showBg", properties={"value": 0.0}
+                ParamType.CONSTANT_FLOAT1,
+                "Show Background",
+                "showBg",
+                properties={"value": 0.0},
             ),
         ]
 
@@ -673,7 +676,9 @@ void main() {
 
         # Audio waveform input
         audio_input = ISFInput(
-            name="audioInput", input_type="audio", max_val=256  # Number of samples
+            name="audioInput",
+            input_type="audio",
+            max_val=256,  # Number of samples
         )
         param = convert_isf_input_to_parameter(audio_input)
         assert param is not None
@@ -682,7 +687,9 @@ void main() {
 
         # Audio FFT input
         fft_input = ISFInput(
-            name="audioFFT", input_type="audioFFT", max_val=128  # Number of FFT bins
+            name="audioFFT",
+            input_type="audioFFT",
+            max_val=128,  # Number of FFT bins
         )
         param = convert_isf_input_to_parameter(fft_input)
         assert param is not None

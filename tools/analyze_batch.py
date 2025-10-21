@@ -91,7 +91,9 @@ class AnalysisReporter:
                 if self.verbose:
                     for error in errors[:5]:  # Show first 5
                         pass_str = (
-                            f" (pass {error.pass_index})" if error.pass_index is not None else ""
+                            f" (pass {error.pass_index})"
+                            if error.pass_index is not None
+                            else ""
                         )
                         print(f"      • {error.message}{pass_str}")
                     if len(errors) > 5:
@@ -129,7 +131,9 @@ class AnalysisReporter:
         if result.files_with_errors > 0 and not self.quiet:
             print("\nFiles with most errors:")
             sorted_files = sorted(
-                result.file_results.items(), key=lambda x: x[1].error_count, reverse=True
+                result.file_results.items(),
+                key=lambda x: x[1].error_count,
+                reverse=True,
             )
             for filename, file_result in sorted_files[:5]:
                 if file_result.error_count > 0:
@@ -140,11 +144,15 @@ class AnalysisReporter:
             category_counts = {}
             for file_result in result.file_results.values():
                 for issue in file_result.issues:
-                    category_counts[issue.category] = category_counts.get(issue.category, 0) + 1
+                    category_counts[issue.category] = (
+                        category_counts.get(issue.category, 0) + 1
+                    )
 
             if category_counts:
                 print("\nIssues by category:")
-                for category, count in sorted(category_counts.items(), key=lambda x: -x[1]):
+                for category, count in sorted(
+                    category_counts.items(), key=lambda x: -x[1]
+                ):
                     print(f"  • {category}: {count}")
 
 
@@ -165,15 +173,21 @@ def parse_args():
 
     # Analysis checks
     parser.add_argument(
-        "--check-structure", action="store_true", help="Check XML structure and basic validity"
+        "--check-structure",
+        action="store_true",
+        help="Check XML structure and basic validity",
     )
 
     parser.add_argument(
-        "--check-uniforms", action="store_true", help="Check for missing uniform declarations"
+        "--check-uniforms",
+        action="store_true",
+        help="Check for missing uniform declarations",
     )
 
     parser.add_argument(
-        "--check-undefined", action="store_true", help="Find undefined variables (deep analysis)"
+        "--check-undefined",
+        action="store_true",
+        help="Find undefined variables (deep analysis)",
     )
 
     parser.add_argument(
@@ -194,15 +208,23 @@ def parse_args():
     )
 
     parser.add_argument(
-        "--no-save-results", action="store_true", help="Do not save results to JSON file"
+        "--no-save-results",
+        action="store_true",
+        help="Do not save results to JSON file",
     )
 
     parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Enable verbose output with detailed issues"
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Enable verbose output with detailed issues",
     )
 
     parser.add_argument(
-        "-q", "--quiet", action="store_true", help="Suppress progress output (only show summary)"
+        "-q",
+        "--quiet",
+        action="store_true",
+        help="Suppress progress output (only show summary)",
     )
 
     return parser.parse_args()

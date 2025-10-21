@@ -232,7 +232,9 @@ def adapt_isf_shader_code(
     # IMG_THIS_PIXEL(image) -> texture(image, gl_FragCoord.xy / RENDERSIZE)
     # This must come before IMG_NORM_PIXEL to avoid partial matches
     code = re.sub(
-        r"\bIMG_THIS_PIXEL\s*\(\s*(\w+)\s*\)", r"texture(\1, gl_FragCoord.xy / RENDERSIZE)", code
+        r"\bIMG_THIS_PIXEL\s*\(\s*(\w+)\s*\)",
+        r"texture(\1, gl_FragCoord.xy / RENDERSIZE)",
+        code,
     )
 
     # IMG_NORM_THIS_PIXEL(image) -> texture(image, gl_FragCoord.xy / RENDERSIZE)
@@ -348,7 +350,13 @@ def evaluate_pass_dimension(expression, width: int, height: int) -> int:
     expr = expr.replace("$HEIGHT", str(height))
 
     # Create safe evaluation context with math functions
-    safe_dict = {"floor": math.floor, "ceil": math.ceil, "max": max, "min": min, "__builtins__": {}}
+    safe_dict = {
+        "floor": math.floor,
+        "ceil": math.ceil,
+        "max": max,
+        "min": min,
+        "__builtins__": {},
+    }
 
     try:
         result = eval(expr, safe_dict)
@@ -616,7 +624,10 @@ def convert_isf_to_kodelife(
 
     # DATE uniform
     date_param = Parameter(
-        param_type=ParamType.DATE, display_name="Date", variable_name="DATE", ui_expanded=0
+        param_type=ParamType.DATE,
+        display_name="Date",
+        variable_name="DATE",
+        ui_expanded=0,
     )
     builder.add_global_param(date_param)
 

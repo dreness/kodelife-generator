@@ -337,7 +337,9 @@ class KlprojAnalyzer:
             if passes_elem is None:
                 result.issues.append(
                     AnalysisIssue(
-                        severity="error", category="structure", message="No <passes> element found"
+                        severity="error",
+                        category="structure",
+                        message="No <passes> element found",
                     )
                 )
                 return result
@@ -348,20 +350,26 @@ class KlprojAnalyzer:
             if len(passes) == 0:
                 result.issues.append(
                     AnalysisIssue(
-                        severity="error", category="structure", message="No render passes found"
+                        severity="error",
+                        category="structure",
+                        message="No render passes found",
                     )
                 )
 
         except ET.ParseError as e:
             result.issues.append(
                 AnalysisIssue(
-                    severity="error", category="structure", message=f"XML parse error: {str(e)}"
+                    severity="error",
+                    category="structure",
+                    message=f"XML parse error: {str(e)}",
                 )
             )
         except Exception as e:
             result.issues.append(
                 AnalysisIssue(
-                    severity="error", category="structure", message=f"Analysis error: {str(e)}"
+                    severity="error",
+                    category="structure",
+                    message=f"Analysis error: {str(e)}",
                 )
             )
 

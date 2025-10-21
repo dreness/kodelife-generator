@@ -90,8 +90,12 @@ class DiscoveryReporter:
 
         total = len(multipass) + len(single_pass)
         print(f"\nTotal ISF shaders found: {total}")
-        print(f"  🔄 Multipass: {len(multipass)} ({len(multipass)/max(1,total)*100:.1f}%)")
-        print(f"  ⚡ Single-pass: {len(single_pass)} ({len(single_pass)/max(1,total)*100:.1f}%)")
+        print(
+            f"  🔄 Multipass: {len(multipass)} ({len(multipass) / max(1, total) * 100:.1f}%)"
+        )
+        print(
+            f"  ⚡ Single-pass: {len(single_pass)} ({len(single_pass) / max(1, total) * 100:.1f}%)"
+        )
 
         if multipass:
             pass_counts = [shader.num_passes for shader in multipass]
@@ -128,11 +132,17 @@ def parse_args():
     )
 
     # Filtering options
-    parser.add_argument("--multipass-only", action="store_true", help="Only show multipass shaders")
+    parser.add_argument(
+        "--multipass-only", action="store_true", help="Only show multipass shaders"
+    )
 
-    parser.add_argument("--single-only", action="store_true", help="Only show single-pass shaders")
+    parser.add_argument(
+        "--single-only", action="store_true", help="Only show single-pass shaders"
+    )
 
-    parser.add_argument("--category", help="Filter by category (case-insensitive substring match)")
+    parser.add_argument(
+        "--category", help="Filter by category (case-insensitive substring match)"
+    )
 
     parser.add_argument(
         "--min-passes",
@@ -149,7 +159,9 @@ def parse_args():
         help="Output JSON file (default: multipass_isf_shaders.json)",
     )
 
-    parser.add_argument("--no-save", action="store_true", help="Do not save results to JSON file")
+    parser.add_argument(
+        "--no-save", action="store_true", help="Do not save results to JSON file"
+    )
 
     parser.add_argument(
         "--stats-only",
@@ -159,7 +171,10 @@ def parse_args():
 
     # Reporting options
     parser.add_argument(
-        "-v", "--verbose", action="store_true", help="Show detailed information about each shader"
+        "-v",
+        "--verbose",
+        action="store_true",
+        help="Show detailed information about each shader",
     )
 
     parser.add_argument(
@@ -201,11 +216,15 @@ def main():
         filtered_multipass = []
 
     if args.category:
-        filtered_multipass = discovery.filter_by_category(args.category, filtered_multipass)
+        filtered_multipass = discovery.filter_by_category(
+            args.category, filtered_multipass
+        )
         filtered_single = discovery.filter_by_category(args.category, filtered_single)
 
     if args.min_passes:
-        filtered_multipass = [s for s in filtered_multipass if s.num_passes >= args.min_passes]
+        filtered_multipass = [
+            s for s in filtered_multipass if s.num_passes >= args.min_passes
+        ]
 
     # Count shaders by category
     categories = {}
@@ -216,7 +235,9 @@ def main():
     # Show results
     if not args.stats_only:
         if filtered_multipass:
-            reporter.print_section(f"MULTIPASS SHADERS ({len(filtered_multipass)})", width=80)
+            reporter.print_section(
+                f"MULTIPASS SHADERS ({len(filtered_multipass)})", width=80
+            )
             for shader in sorted(filtered_multipass, key=lambda s: s.name):
                 reporter.report_multipass_shader(shader)
 
@@ -225,7 +246,9 @@ def main():
 
         if filtered_single and not args.multipass_only:
             if not args.verbose and not args.quiet:
-                reporter.print_section(f"SINGLE-PASS SHADERS ({len(filtered_single)})", width=80)
+                reporter.print_section(
+                    f"SINGLE-PASS SHADERS ({len(filtered_single)})", width=80
+                )
                 print(f"\nFound {len(filtered_single)} single-pass shaders")
                 if len(filtered_single) <= 20:
                     for shader in sorted(filtered_single, key=lambda s: s.name)[:20]:
