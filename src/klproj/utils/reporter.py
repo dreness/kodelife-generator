@@ -104,7 +104,11 @@ class ConversionReporter:
                     print(f"  {Path(item).name}")
 
     def report_progress(
-        self, current: int, total: int, filename: str, file_info: Union[Path, ISFInfo, None] = None
+        self,
+        current: int,
+        total: int,
+        filename: str,
+        file_info: Union[Path, ISFInfo, None] = None,
     ):
         """
         Report progress during batch conversion.

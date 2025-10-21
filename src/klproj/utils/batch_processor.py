@@ -158,7 +158,11 @@ class BatchConverter:
 
         # Check if output already exists and we're not overwriting
         if output_path.exists() and not self.overwrite:
-            return False, None, "Output file already exists (use --overwrite to replace)"
+            return (
+                False,
+                None,
+                "Output file already exists (use --overwrite to replace)",
+            )
 
         try:
             # Convert the file
